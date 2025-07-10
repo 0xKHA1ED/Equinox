@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Card Debt Visualizer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <!-- Minimal header, actual H1 title will be in the main content -->
+            <!-- Could have a logo or simple brand name here if desired -->
+        </div>
+    </header>
+
+    <main class="site-main">
+        <div class="container">
+            <h1 class="page-main-title">Take Control of Your Credit Card Debt</h1>
+            <p class="page-intro">Enter your credit card details and potential monthly payment amounts to visualize your path to becoming debt-free. All calculations are done in your browser, and your data is never saved or transmitted.</p>
+
+            <div class="input-section-wrapper">
+                <!-- This will be a two-column layout -->
+                <section id="credit-cards-column" class="input-column">
+                    <h2 class="column-title">Your Credit Cards</h2>
+                    <div id="credit-card-forms-container">
+                        <!-- Card input forms will be dynamically added here by JS -->
+                    </div>
+                    <button id="add-card-btn" class="btn btn-secondary btn-add-item">
+                        <i data-lucide="plus-circle" class="btn-icon"></i> Add Another Card
+                    </button>
+                </section>
+
+                <section id="payment-scenarios-column" class="input-column">
+                    <h2 class="column-title">Your Payment Scenarios</h2>
+                    <div id="scenario-forms-container">
+                        <!-- Scenario input forms will be dynamically added here by JS -->
+                    </div>
+                    <button id="add-scenario-btn" class="btn btn-secondary btn-add-item">
+                        <i data-lucide="plus-circle" class="btn-icon"></i> Add Another Scenario
+                    </button>
+                </section>
+            </div>
+
+            <div class="calculate-cta-wrapper">
+                <button id="calculate-btn" class="btn btn-primary btn-calculate-cta">
+                    Calculate Scenarios <i data-lucide="arrow-right" class="btn-icon-right"></i>
+                </button>
+            </div>
+
+            <section id="results-section" class="results-section-wrapper" style="display: none;"> /* Initially hidden */
+                <h2 class="section-title">Here's Your Repayment Plan Comparison</h2>
+
+                <div id="results-summary-card" class="card">
+                    <!-- Optimal Strategy Highlight & Savings Insight -->
+                    <div id="optimal-strategy-highlight"></div>
+                    <div id="savings-insight-text"></div>
+                    <!-- Bar chart for comparing scenarios -->
+                    <div class="chart-container">
+                        <canvas id="scenarioComparisonBarChart"></canvas>
+                    </div>
+                </div>
+
+                <div id="detailed-scenario-breakdown" class="detailed-breakdown-tabs">
+                    <div class="tab-list-container" role="tablist" aria-label="Scenario Details">
+                        <!-- Tab buttons will be dynamically added here by JS -->
+                    </div>
+                    <div class="tab-content-container">
+                        <!-- Tab panels (content) will be dynamically added here by JS -->
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2024 Debt Visualizer. All data processed locally.
+                <a href="#" id="feedbackSurveyLink_v3" target="_blank" rel="noopener noreferrer">Feedback</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="calculation_engine.js"></script>
+    <script src="script.js"></script>
+    <script>
+        lucide.createIcons(); // Initial render for static icons
+    </script>
+</body>
+</html>
