@@ -12,8 +12,10 @@
         <h1>Credit Card Debt Visualizer</h1>
     </header>
     <main>
+        <p class="text-muted text-center intro-text">Welcome! This tool helps you understand your credit card debt and explore different repayment strategies. Enter your card details and potential monthly payment amounts to see how quickly you can become debt-free and how much interest you might pay.</p>
+
         <section id="input-section">
-            <h2>Enter Your Credit Card Details</h2>
+            <h2>1. Enter Your Credit Card Details</h2>
             <div id="credit-card-forms-container">
                 <!-- Initial credit card form will be here, others added by JS -->
                 <div class="credit-card-entry">
@@ -35,7 +37,8 @@
         </section>
 
         <section id="scenario-input-section">
-            <h2>Enter Repayment Scenarios</h2>
+            <h2>2. Enter Repayment Scenarios</h2>
+            <p class="text-muted">Define one or more total monthly payment amounts you're considering dedicating to all your cards combined.</p>
             <div id="scenario-forms-container">
                 <div class="scenario-entry">
                     <h3>Scenario 1</h3>
@@ -47,6 +50,7 @@
         </section>
 
         <section id="calculate-section">
+            <h2>3. Calculate & See Results</h2>
             <button id="calculate-btn">Calculate Repayment Options</button>
         </section>
 
@@ -58,7 +62,7 @@
             <div id="optimal-strategy-summary">
                 <!-- Optimal strategy text will go here -->
             </div>
-            <h2>Detailed Scenario Breakdowns</h2>
+            <h3>Detailed Scenario Breakdowns</h3>
             <div id="detailed-charts-container">
                 <!-- Detailed charts for each scenario will go here -->
             </div>

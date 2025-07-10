@@ -1,179 +1,343 @@
+/* --- Base Styles & Variables --- */
+:root {
+    --font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    --font-secondary: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* Fallback */
+
+    --color-primary: #007bff; /* Blue */
+    --color-primary-dark: #0056b3;
+    --color-secondary: #28a745; /* Green */
+    --color-secondary-dark: #1e7e34;
+    --color-light: #f8f9fa; /* Very light gray / Off-white */
+    --color-dark: #343a40; /* Dark Gray */
+    --color-text: #212529; /* Near black for body text */
+    --color-muted: #6c757d; /* Muted gray for less important text */
+    --color-border: #dee2e6; /* Light gray for borders */
+    --color-white: #ffffff;
+    --color-success-bg: #d4edda;
+    --color-success-border: #c3e6cb;
+    --color-success-text: #155724;
+
+
+    --shadow-sm: 0 .125rem .25rem rgba(0,0,0,.075);
+    --shadow-md: 0 .5rem 1rem rgba(0,0,0,.15);
+    --border-radius-sm: .2rem;
+    --border-radius-md: .3rem;
+}
+
 body {
-    font-family: sans-serif;
+    font-family: var(--font-primary);
     line-height: 1.6;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
-    color: #333;
+    background-color: var(--color-light);
+    color: var(--color-text);
+    font-size: 16px; /* Base font size */
 }
 
-header {
-    background: #333;
-    color: #fff;
-    padding: 1rem 0;
+main {
+    padding: 1.5rem; /* Increased padding */
+    max-width: 960px; /* Slightly adjusted max-width */
+    margin: 2rem auto; /* More margin */
+    overflow: hidden;
+}
+
+/* --- Typography --- */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-secondary);
+    color: var(--color-dark);
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+}
+
+h1 { font-size: 2.25rem; } /* Example: Responsive font sizes can be added with media queries */
+h2 { font-size: 1.75rem; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1.1rem; }
+
+p {
+    margin-bottom: 1rem;
+}
+
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+a:hover {
+    color: var(--color-primary-dark);
+    text-decoration: underline;
+}
+
+
+/* --- General Element Styling (will be overridden by specific component styles later) --- */
+section { /* This will be the base for "card" like elements */
+    background: var(--color-white);
+    margin-bottom: 2rem; /* Increased spacing */
+    padding: 1.5rem 2rem; /* More horizontal padding */
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border);
+}
+
+input[type="text"],
+input[type="number"] {
+    display: block;
+    width: 100%;
+    padding: .5rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--color-text);
+    background-color: var(--color-white);
+    background-clip: padding-box;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    box-sizing: border-box;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    margin-bottom: 0.75rem; /* Space below inputs */
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+    border-color: var(--color-primary);
+    outline: 0;
+    box-shadow: 0 0 0 .2rem rgba(0,123,255,.25);
+}
+
+
+label {
+    display: inline-block; /* Changed from block */
+    margin-bottom: .5rem;
+    font-weight: 500; /* Slightly bolder */
+    color: var(--color-dark);
+}
+
+button {
+    display: inline-block;
+    font-weight: 400;
+    color: var(--color-white);
     text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    background-color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    padding: .5rem 1rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: var(--border-radius-sm);
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+button:hover {
+    background-color: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+    text-decoration: none;
+}
+
+button:focus {
+    outline: 0;
+    box-shadow: 0 0 0 .2rem rgba(0,123,255,.5);
+}
+
+/* --- Header & Footer (Basic Modernization) --- */
+header {
+    background: var(--color-white);
+    color: var(--color-dark);
+    padding: 1.5rem 0;
+    text-align: center;
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
 }
 
 header h1 {
     margin: 0;
-}
-
-main {
-    padding: 1rem;
-    max-width: 1000px; /* Slightly narrower for better readability on wider screens */
-    margin: auto;
-    overflow: hidden;
-}
-
-section {
-    background: #fff;
-    margin-bottom: 1.5rem; /* Increased spacing between sections */
-    padding: 1.5rem; /* Increased padding within sections */
-    border-radius: 8px; /* Slightly more rounded corners */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow for depth */
-}
-
-h2 {
-    margin-top: 0; /* Remove default top margin for h2 within sections */
-    color: #333;
+    font-weight: 600; /* Bolder for main title */
 }
 
 footer {
     text-align: center;
-    padding: 1rem;
-    background: #333;
-    color: #fff;
+    padding: 1.5rem 0;
+    background: var(--color-white);
+    color: var(--color-muted);
+    margin-top: 2rem;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.9em;
+}
+
+/* --- Specific Component Styles (to be refined in subsequent steps) --- */
+
+/* .credit-card-entry, .scenario-entry will be styled as part of their parent sections */
+/* .credit-card-entry h3, .scenario-entry h3 will inherit from general h3 styles */
+
+
+/* #add-card-btn, #add-scenario-btn will use a secondary style or specific styling */
+/* #calculate-btn will be a prominent action button */
+
+
+/* #results-section styles */
+/* #optimal-strategy-summary */
+/* .scenario-detail-container */
+
+
+/* .feedback-link styling */
+.feedback-link {
     margin-top: 1rem;
 }
-
-/* Basic styling for form elements - will be expanded */
-input[type="text"],
-input[type="number"] {
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-    width: calc(100% - 1.2rem); /* Adjust for padding */
-    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+.feedback-link a {
+    color: var(--color-primary);
+}
+.feedback-link a:hover {
+    color: var(--color-primary-dark);
 }
 
-label {
-    display: block;
-    margin-bottom: 0.2rem;
-    font-weight: bold;
+/* --- Utility Classes --- */
+.text-muted {
+    color: var(--color-muted);
+}
+.text-center {
+    text-align: center;
+}
+.mb-1 { margin-bottom: 0.25rem !important; }
+.mb-2 { margin-bottom: 0.5rem !important; }
+.mb-3 { margin-bottom: 1rem !important; }
+.mt-1 { margin-top: 0.25rem !important; }
+.mt-2 { margin-top: 0.5rem !important; }
+.mt-3 { margin-top: 1rem !important; }
+
+/* --- Input Sections Styling --- */
+#input-section h2,
+#scenario-input-section h2,
+#calculate-section h2 { /* Added calculate-section h2 here for consistency */
+    margin-bottom: 1.5rem; /* More space after section titles */
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.intro-text {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
 }
 
 .credit-card-entry, .scenario-entry {
-    border: 1px solid #eee;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    border-radius: 4px;
-    background-color: #f9f9f9;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    background-color: var(--color-light); /* Slightly off-white to distinguish from section background */
 }
 
 .credit-card-entry h3, .scenario-entry h3 {
-    margin-top: 0;
-    color: #555;
+    font-size: 1.15rem;
+    color: var(--color-primary); /* Use primary color for these sub-titles */
+    margin-bottom: 1rem;
 }
 
-button {
-    background: #5cb85c;
-    color: white;
-    padding: 0.7rem 1rem;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 1em;
-}
-
-button:hover {
-    background: #4cae4c;
-}
-
+/* Style for "Add" buttons */
 #add-card-btn, #add-scenario-btn {
-    background-color: #007bff;
-    margin-top: 0.5rem; /* Space above if there are entries */
+    background-color: var(--color-secondary); /* Green for add buttons */
+    border-color: var(--color-secondary);
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
 }
+
 #add-card-btn:hover, #add-scenario-btn:hover {
-    background-color: #0056b3;
+    background-color: var(--color-secondary-dark);
+    border-color: var(--color-secondary-dark);
 }
 
-
+/* --- Call to Action Button --- */
 #calculate-btn {
-    display: block;
-    margin: 1.5rem auto; /* Increased margin */
-    padding: 0.9rem 2rem; /* Slightly larger padding */
-    font-size: 1.2em; /* Slightly larger font */
-    background-color: #28a745; /* Greener shade for primary action */
+    display: block; /* Make it block to center with margin auto */
+    min-width: 250px; /* Ensure a good minimum width */
+    margin: 1.5rem auto; /* Center it and provide vertical spacing */
+    padding: 0.75rem 1.5rem; /* Generous padding */
+    font-size: 1.2rem; /* Larger font size */
+    font-weight: 500;
+    background-color: var(--color-primary); /* Use primary color */
+    border-color: var(--color-primary);
+    text-transform: uppercase; /* Optional: for more emphasis */
+    letter-spacing: 0.5px; /* Optional */
 }
+
 #calculate-btn:hover {
-    background-color: #218838;
+    background-color: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
 }
 
+/* --- Results Section Styling --- */
+#results-section {
+    /* The base section style (card-like) is already applied */
+    /* Override or add specific styles if needed */
+}
 
-#results-section .results-title { /* New class for the main results title */
+#results-section .results-title {
     text-align: center;
-    font-size: 1.8em;
-    color: #333;
-    margin-bottom: 1.5rem;
+    font-size: 2rem; /* Larger title for this main section */
+    color: var(--color-dark);
+    margin-bottom: 2rem; /* More space after this title */
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border);
 }
 
-#results-section h2, #results-section h3, #results-section h4 {
-    color: #333;
-    margin-bottom: 0.5rem;
+#summary-charts-container {
+    padding: 1rem;
+    margin-bottom: 2rem;
+    /* background-color: var(--color-light); Optional: if want to nest visually */
+    /* border: 1px solid var(--color-border); */
+    /* border-radius: var(--border-radius-sm); */
 }
-#results-section h3 { /* More specific targeting for scenario detail titles if needed */
-    color: #444;
-}
-
 
 #optimal-strategy-summary {
-    background-color: #e6ffed;
-    border: 1px solid #5cb85c;
-    padding: 1rem;
+    background-color: var(--color-success-bg);
+    border: 1px solid var(--color-success-border);
+    color: var(--color-success-text);
+    padding: 1.5rem;
     margin-top: 1rem;
-    margin-bottom: 2rem;
-    border-radius: 4px;
+    margin-bottom: 2.5rem; /* More space after this important summary */
+    border-radius: var(--border-radius-md);
 }
 
 #optimal-strategy-summary h4 {
     margin-top: 0;
-    color: #2e7d32;
+    color: var(--color-success-text); /* Ensure heading color matches text */
+    font-size: 1.3rem;
+    font-weight: 600;
 }
 
 #optimal-strategy-summary p {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
 }
 
 #optimal-strategy-summary .explanation {
     font-size: 0.9em;
-    color: #555;
+    opacity: 0.9;
     margin-top: 1rem;
 }
 
-.scenario-detail-container {
-    margin-bottom: 2rem;
-    padding: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #fdfdfd;
-}
-
-.scenario-detail-container h3 {
+#results-section > h3 { /* For "Detailed Scenario Breakdowns" title */
+    font-size: 1.5rem;
+    color: var(--color-dark);
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
     text-align: center;
-    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px dashed var(--color-border);
 }
 
-.feedback-link {
-    font-size: 0.9em;
-    margin-top: 0.5rem;
+.scenario-detail-container {
+    background-color: var(--color-white); /* Ensure it's on white if section bg is light gray */
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
 }
 
-.feedback-link a {
-    color: #86c5da; /* Light blue, stands out a bit on dark footer */
-    text-decoration: none;
+.scenario-detail-container h3 { /* Title for each detailed chart e.g. "Scenario 1: Paying $X/month" */
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    color: var(--color-primary);
 }
 
-.feedback-link a:hover {
-    text-decoration: underline;
-}
+/* Removing the old, commented-out styles */

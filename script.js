@@ -3,6 +3,19 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log("DOM fully loaded and parsed");
 
+    // --- Chart.js Global Styling ---
+    // Attempt to set global font styles for Chart.js to match the UI
+    // Note: CSS variables (--font-primary, --color-text) are not directly accessible in JS this way for Chart.js globals.
+    // We'll use common fallbacks or hardcode values that match the CSS.
+    try {
+        Chart.defaults.font.family = "'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"; // Matches --font-secondary or common part of --font-primary
+        Chart.defaults.color = '#343a40'; // Matches --color-dark or a suitable text color
+        Chart.defaults.borderColor = '#dee2e6'; // Matches --color-border
+    } catch (e) {
+        console.warn("Could not set Chart.js defaults. Chart.js might not be loaded yet or version incompatibility.", e);
+    }
+    // --- End Chart.js Global Styling ---
+
     const addCardBtn = document.getElementById('add-card-btn');
     const creditCardFormsContainer = document.getElementById('credit-card-forms-container');
     let cardCount = 1;
