@@ -67,8 +67,6 @@ function collectAndProcessData() {
     const cardData = [];
     const cardEntries = document.querySelectorAll('#credit-card-forms-container .credit-card-entry');
     cardEntries.forEach((entry, index) => {
-        const nickname = entry.querySelector(`input[name="card-nickname"]`).value;
-        const balance = parseFloat(entry.querySelector(`input[name="current-balance"]`).value);
         const nicknameInput = entry.querySelector(`input[name="card-nickname"]`);
         const balanceInput = entry.querySelector(`input[name="current-balance"]`);
         const interestRateInput = entry.querySelector(`input[name="interest-rate"]`);
@@ -179,7 +177,7 @@ function collectAndProcessData() {
 
         const allScenarioResults = calculateAllScenarios(cardData, scenarioData);
         console.log("All Scenario Results:", allScenarioResults);
-        displayResults(allScenarioResults, initialCardsData); // Pass initialCardsData for context if needed
+        displayResults(allScenarioResults, cardData); // Pass collected cardData for context
     }
 }
 /**
