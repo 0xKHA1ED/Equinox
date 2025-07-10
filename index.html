@@ -5,73 +5,148 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Credit Card Debt Visualizer</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Consider adding Inter or Lato font from Google Fonts if not relying on system fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <header>
-        <h1>Credit Card Debt Visualizer</h1>
+        <h1 id="main-title">Credit Card Debt Visualizer</h1> <!-- Simplified header, main title moves to Stage 1 -->
     </header>
+
     <main>
-        <p class="text-muted text-center intro-text">Welcome! This tool helps you understand your credit card debt and explore different repayment strategies. Enter your card details and potential monthly payment amounts to see how quickly you can become debt-free and how much interest you might pay.</p>
+        <!-- Stage 1: Welcome & Initial Input -->
+        <section id="stage-1-welcome-input" class="stage">
+            <h1 class="page-title">Take Control of Your Credit Card Debt</h1>
+            <p class="intro-paragraph">Let's create a clear path to becoming debt-free. Start by adding your first credit card below. It's 100% private—all data stays on your device.</p>
 
-        <section id="input-section">
-            <h2>1. Enter Your Credit Card Details</h2>
             <div id="credit-card-forms-container">
-                <!-- Initial credit card form will be here, others added by JS -->
-                <div class="credit-card-entry">
-                    <h3>Card 1</h3>
-                    <label for="card-nickname-1">Card Nickname:</label>
-                    <input type="text" id="card-nickname-1" name="card-nickname" placeholder="e.g., Visa Rewards">
+                <div class="card-input-form-container container-card">
+                    <h2 class="form-title">Card 1</h2>
 
-                    <label for="current-balance-1">Current Balance ($):</label>
-                    <input type="number" id="current-balance-1" name="current-balance" placeholder="e.g., 5000" step="0.01" min="0">
+                    <div class="form-group">
+                        <label for="card-nickname-1">Card Nickname</label>
+                        <input type="text" id="card-nickname-1" name="card-nickname" placeholder="e.g., Visa Rewards, Store Card">
+                    </div>
 
-                    <label for="interest-rate-1">Monthly Interest Rate (%):</label>
-                    <input type="number" id="interest-rate-1" name="interest-rate" placeholder="e.g., 1.5" step="0.01" min="0">
+                    <div class="form-group">
+                        <label for="current-balance-1">Current Balance ($)</label>
+                        <input type="number" id="current-balance-1" name="current-balance" placeholder="e.g., 5000" step="0.01" min="0">
+                    </div>
 
-                    <label for="min-payment-percentage-1">Minimum Payment (% of Balance):</label>
-                    <input type="number" id="min-payment-percentage-1" name="min-payment-percentage" placeholder="e.g., 2" step="0.01" min="0">
+                    <div class="form-group">
+                        <label for="interest-rate-1">Monthly Interest Rate (%)</label>
+                        <input type="number" id="interest-rate-1" name="interest-rate" placeholder="e.g., 1.5" step="0.01" min="0">
+                        <!-- Tooltip icon placeholder: <span class="tooltip-icon" data-tooltip="Explanation...">?</span> -->
+                    </div>
+
+                    <div class="form-group">
+                        <label for="min-payment-percentage-1">Minimum Monthly Payment (% of Balance)</label>
+                        <input type="number" id="min-payment-percentage-1" name="min-payment-percentage" placeholder="e.g., 2" step="0.01" min="0">
+                        <span class="tooltip-trigger" aria-label="Information about minimum payment percentage" data-tooltip-text="Find this percentage on your monthly statement. It's usually 1-3% of your balance.">?</span>
+                    </div>
                 </div>
             </div>
-            <button id="add-card-btn">Add Another Card</button>
+
+            <button id="add-card-btn" class="btn btn-primary btn-add">
+                <span class="icon-add">+</span> Add Another Card
+            </button>
         </section>
 
-        <section id="scenario-input-section">
-            <h2>2. Enter Repayment Scenarios</h2>
-            <p class="text-muted">Define one or more total monthly payment amounts you're considering dedicating to all your cards combined.</p>
+        <!-- Stage 2: Defining Scenarios -->
+        <section id="stage-2-scenarios" class="stage container-card" style="display: none;"> /* Initially hidden, also a container-card */
+            <h2 class="section-title">2. Define Your Repayment Scenarios</h2>
+            <p class="info-text">Now, let's explore a few payment options. How much in total could you dedicate to all your cards each month?</p>
+
+            <div class="baseline-info">
+                Your combined minimum payment is: <strong id="combined-min-payment-display">$0.00</strong>
+                <span class="tooltip-trigger" aria-label="Information about combined minimum payment" data-tooltip-text="This is the sum of minimum payments for all cards you entered. Paying only this amount will likely take the longest and cost the most in interest.">?</span>
+            </div>
+
             <div id="scenario-forms-container">
-                <div class="scenario-entry">
-                    <h3>Scenario 1</h3>
-                    <label for="total-monthly-payment-1">Total Monthly Payment ($):</label>
-                    <input type="number" id="total-monthly-payment-1" name="total-monthly-payment" placeholder="e.g., 300" step="0.01" min="0">
+                <div class="scenario-input-form"> <!-- Initial Scenario 1 -->
+                    <h3 class="form-title">Scenario 1</h3>
+                    <div class="form-group">
+                        <label for="total-monthly-payment-1">Total Monthly Payment ($)</label>
+                        <input type="number" id="total-monthly-payment-1" name="total-monthly-payment" placeholder="e.g., Combined minimums" step="0.01" min="0">
+                    </div>
                 </div>
+                <!-- Additional scenarios will be added here by JavaScript -->
             </div>
-            <button id="add-scenario-btn">Add Another Scenario</button>
+
+            <button id="add-scenario-btn" class="btn btn-secondary btn-add">
+                <span class="icon-add">+</span> Add Another Scenario
+            </button>
+
+            <button id="calculate-btn" class="btn btn-primary btn-cta">
+                Calculate Repayment Options
+            </button>
         </section>
 
-        <section id="calculate-section">
-            <h2>3. Calculate & See Results</h2>
-            <button id="calculate-btn">Calculate Repayment Options</button>
-        </section>
+        <!-- Stage 3: The Results -->
+        <section id="stage-3-results" class="stage" style="display: none;"> /* Initially hidden */
+            <h2 class="section-title">3. Your Repayment Options Explored</h2>
 
-        <section id="results-section">
-            <h2 class="results-title">Your Repayment Options Explored</h2>
-            <div id="summary-charts-container">
-                <canvas id="comparisonChart"></canvas>
+            <div id="key-insight-callout" class="container-card callout-accent">
+                <!-- JS will populate this: "By paying [Optimal Amount] per month, you can be debt-free [X Years] sooner and save [$Y,YYY] in interest!" -->
+                <p>Calculating your best options...</p>
             </div>
-            <div id="optimal-strategy-summary">
-                <!-- Optimal strategy text will go here -->
+
+            <div id="scenario-comparison-cards-container">
+                <!-- JS will populate this with scenario cards -->
+                <!-- Example of one card structure (repeated by JS):
+                <div class="scenario-summary-card container-card">
+                    <div class="scenario-badge recommended-badge">Recommended</div>
+                    <h3 class="scenario-title">Scenario: $XXX/month</h3>
+                    <p class="metric"><strong>Time to Debt-Free:</strong> <span class="metric-value">X Years, Y Months</span></p>
+                    <p class="metric"><strong>Total Interest Paid:</strong> <span class="metric-value metric-interest-paid">$X,XXX</span></p>
+                    <p class="metric"><strong>Total Principal Paid:</strong> <span class="metric-value">$X,XXX</span></p>
+                    <a href="#" class="details-link" data-scenario-id="1">See Detailed Breakdown &raquo;</a>
+                </div>
+                -->
             </div>
-            <h3>Detailed Scenario Breakdowns</h3>
-            <div id="detailed-charts-container">
-                <!-- Detailed charts for each scenario will go here -->
+
+            <div id="comparative-bar-chart-container" class="container-card">
+                <h3 class="chart-title">Total Interest Paid by Scenario</h3>
+                <canvas id="comparisonChart"></canvas> <!-- Existing canvas ID from previous version -->
+            </div>
+
+            <div id="detailed-breakdown-accordion-container">
+                <!-- JS will populate this when "See Detailed Breakdown" is clicked -->
+                <!-- Example of one accordion item structure:
+                <div class="accordion-item" id="accordion-item-1">
+                    <div class="accordion-header">
+                        <h4>Detailed Breakdown for Scenario: $XXX/month</h4>
+                    </div>
+                    <div class="accordion-content">
+                        <p class="strategy-explanation">This plan uses the Debt Avalanche method...</p>
+                        <div class="table-responsive">
+                            <table class="month-by-month-table">
+                                <thead>
+                                    <tr>
+                                        <th>Month</th>
+                                        <th>Total Payment</th>
+                                        <th>Interest Paid</th>
+                                        <th>Principal Paid</th>
+                                        <th>Ending Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                     JS populates rows here
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                -->
             </div>
         </section>
     </main>
+
     <footer>
-        <p>All data is processed locally in your browser. No information is saved or transmitted.</p>
-        <p class="feedback-link">Happy with the tool? <a href="#" id="feedbackSurveyLink" target="_blank" rel="noopener noreferrer">Share your feedback (anonymous survey)</a>.</p>
+        <!-- Footer content, including privacy message and feedback link -->
     </footer>
+
     <script src="calculation_engine.js"></script>
     <script src="script.js"></script>
 </body>

@@ -1,343 +1,603 @@
-/* --- Base Styles & Variables --- */
+/* Stylesheet for Credit Card Debt Visualizer - V2 Design */
+
+/* --- Variables --- */
 :root {
-    --font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    --font-secondary: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* Fallback */
+    /* Color Palette */
+    --color-primary-action: #007BFF; /* Motivating Blue */
+    --color-primary-action-darker: #0056b3;
+    --color-secondary-accent: #FFC107; /* Warm Yellow/Orange */
+    --color-secondary-accent-darker: #d39e00;
+    --color-background: #F8F9FA; /* Off-white */
+    --color-container-bg: #FFFFFF;
+    --color-text-primary: #212529; /* Dark Gray */
+    --color-text-secondary: #6C757D; /* Medium Gray for labels, secondary text */
+    --color-border: #DEE2E6; /* Light Gray for borders */
+    --color-input-focus-border: var(--color-primary-action);
+    --color-input-focus-shadow: rgba(0, 123, 255, 0.25);
+    --color-alert-negative: #DC3545; /* Red/Coral */
+    --color-white: #FFFFFF;
 
-    --color-primary: #007bff; /* Blue */
-    --color-primary-dark: #0056b3;
-    --color-secondary: #28a745; /* Green */
-    --color-secondary-dark: #1e7e34;
-    --color-light: #f8f9fa; /* Very light gray / Off-white */
-    --color-dark: #343a40; /* Dark Gray */
-    --color-text: #212529; /* Near black for body text */
-    --color-muted: #6c757d; /* Muted gray for less important text */
-    --color-border: #dee2e6; /* Light gray for borders */
-    --color-white: #ffffff;
-    --color-success-bg: #d4edda;
-    --color-success-border: #c3e6cb;
-    --color-success-text: #155724;
+    /* Typography */
+    --font-family-primary: 'Inter', 'Lato', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --line-height-base: 1.6; /* Adjusted from 1.5 for better readability */
 
+    /* Spacing & Sizing */
+    --spacing-unit: 8px;
+    --border-radius-base: 8px; /* Slightly larger for a softer look */
+    --border-radius-sm: 4px;
 
-    --shadow-sm: 0 .125rem .25rem rgba(0,0,0,.075);
-    --shadow-md: 0 .5rem 1rem rgba(0,0,0,.15);
-    --border-radius-sm: .2rem;
-    --border-radius-md: .3rem;
+    /* Shadows */
+    --box-shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --box-shadow-lifted: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* --- Base & Body --- */
+html {
+    box-sizing: border-box;
+    font-size: 16px; /* Base font size for rem units */
+}
+*, *:before, *:after {
+    box-sizing: inherit;
 }
 
 body {
-    font-family: var(--font-primary);
-    line-height: 1.6;
+    font-family: var(--font-family-primary);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--line-height-base);
+    color: var(--color-text-primary);
+    background-color: var(--color-background);
     margin: 0;
     padding: 0;
-    background-color: var(--color-light);
-    color: var(--color-text);
-    font-size: 16px; /* Base font size */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Main Layout Containers --- */
+header { /* Simple header as per new structure */
+    padding: calc(var(--spacing-unit) * 2) 0;
+    text-align: center;
+    border-bottom: 1px solid var(--color-border);
+    background-color: var(--color-container-bg);
+}
+#main-title { /* Title in the header */
+    font-size: 1.5rem; /* 24px */
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-secondary);
+    margin: 0;
 }
 
 main {
-    padding: 1.5rem; /* Increased padding */
-    max-width: 960px; /* Slightly adjusted max-width */
-    margin: 2rem auto; /* More margin */
-    overflow: hidden;
-}
-
-/* --- Typography --- */
-h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-secondary);
-    color: var(--color-dark);
-    margin-top: 0;
-    margin-bottom: 0.75rem;
-    font-weight: 500;
-}
-
-h1 { font-size: 2.25rem; } /* Example: Responsive font sizes can be added with media queries */
-h2 { font-size: 1.75rem; }
-h3 { font-size: 1.25rem; }
-h4 { font-size: 1.1rem; }
-
-p {
-    margin-bottom: 1rem;
-}
-
-a {
-    color: var(--color-primary);
-    text-decoration: none;
-}
-a:hover {
-    color: var(--color-primary-dark);
-    text-decoration: underline;
-}
-
-
-/* --- General Element Styling (will be overridden by specific component styles later) --- */
-section { /* This will be the base for "card" like elements */
-    background: var(--color-white);
-    margin-bottom: 2rem; /* Increased spacing */
-    padding: 1.5rem 2rem; /* More horizontal padding */
-    border-radius: var(--border-radius-md);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--color-border);
-}
-
-input[type="text"],
-input[type="number"] {
-    display: block;
-    width: 100%;
-    padding: .5rem .75rem;
-    font-size: 1rem;
-    line-height: 1.5;
-    color: var(--color-text);
-    background-color: var(--color-white);
-    background-clip: padding-box;
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-sm);
-    box-sizing: border-box;
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-    margin-bottom: 0.75rem; /* Space below inputs */
-}
-
-input[type="text"]:focus,
-input[type="number"]:focus {
-    border-color: var(--color-primary);
-    outline: 0;
-    box-shadow: 0 0 0 .2rem rgba(0,123,255,.25);
-}
-
-
-label {
-    display: inline-block; /* Changed from block */
-    margin-bottom: .5rem;
-    font-weight: 500; /* Slightly bolder */
-    color: var(--color-dark);
-}
-
-button {
-    display: inline-block;
-    font-weight: 400;
-    color: var(--color-white);
-    text-align: center;
-    vertical-align: middle;
-    cursor: pointer;
-    user-select: none;
-    background-color: var(--color-primary);
-    border: 1px solid var(--color-primary);
-    padding: .5rem 1rem;
-    font-size: 1rem;
-    line-height: 1.5;
-    border-radius: var(--border-radius-sm);
-    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-}
-
-button:hover {
-    background-color: var(--color-primary-dark);
-    border-color: var(--color-primary-dark);
-    text-decoration: none;
-}
-
-button:focus {
-    outline: 0;
-    box-shadow: 0 0 0 .2rem rgba(0,123,255,.5);
-}
-
-/* --- Header & Footer (Basic Modernization) --- */
-header {
-    background: var(--color-white);
-    color: var(--color-dark);
-    padding: 1.5rem 0;
-    text-align: center;
-    border-bottom: 1px solid var(--color-border);
-    box-shadow: var(--shadow-sm);
-}
-
-header h1 {
-    margin: 0;
-    font-weight: 600; /* Bolder for main title */
+    max-width: 800px; /* Max width for content area */
+    margin: calc(var(--spacing-unit) * 4) auto;
+    padding: 0 calc(var(--spacing-unit) * 2);
 }
 
 footer {
     text-align: center;
-    padding: 1.5rem 0;
-    background: var(--color-white);
-    color: var(--color-muted);
-    margin-top: 2rem;
+    padding: calc(var(--spacing-unit) * 3) 0;
+    margin-top: calc(var(--spacing-unit) * 6);
     border-top: 1px solid var(--color-border);
-    font-size: 0.9em;
+    font-size: 0.875rem; /* 14px */
+    color: var(--color-text-secondary);
+}
+footer a {
+    color: var(--color-primary-action);
+}
+footer a:hover {
+    color: var(--color-primary-action-darker);
 }
 
-/* --- Specific Component Styles (to be refined in subsequent steps) --- */
 
-/* .credit-card-entry, .scenario-entry will be styled as part of their parent sections */
-/* .credit-card-entry h3, .scenario-entry h3 will inherit from general h3 styles */
-
-
-/* #add-card-btn, #add-scenario-btn will use a secondary style or specific styling */
-/* #calculate-btn will be a prominent action button */
-
-
-/* #results-section styles */
-/* #optimal-strategy-summary */
-/* .scenario-detail-container */
-
-
-/* .feedback-link styling */
-.feedback-link {
-    margin-top: 1rem;
-}
-.feedback-link a {
-    color: var(--color-primary);
-}
-.feedback-link a:hover {
-    color: var(--color-primary-dark);
+/* --- Typography --- */
+h1, h2, h3, h4, p {
+    margin-top: 0;
 }
 
-/* --- Utility Classes --- */
-.text-muted {
-    color: var(--color-muted);
-}
-.text-center {
+.page-title { /* H1 in Stage 1 */
+    font-size: 2.25rem; /* 36px */
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
     text-align: center;
-}
-.mb-1 { margin-bottom: 0.25rem !important; }
-.mb-2 { margin-bottom: 0.5rem !important; }
-.mb-3 { margin-bottom: 1rem !important; }
-.mt-1 { margin-top: 0.25rem !important; }
-.mt-2 { margin-top: 0.5rem !important; }
-.mt-3 { margin-top: 1rem !important; }
-
-/* --- Input Sections Styling --- */
-#input-section h2,
-#scenario-input-section h2,
-#calculate-section h2 { /* Added calculate-section h2 here for consistency */
-    margin-bottom: 1.5rem; /* More space after section titles */
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--color-border);
+    margin-bottom: calc(var(--spacing-unit) * 1.5);
 }
 
-.intro-text {
-    font-size: 1.1rem;
-    margin-bottom: 2rem;
+.intro-paragraph {
+    font-size: 1.125rem; /* 18px */
+    color: var(--color-text-secondary);
+    text-align: center;
+    margin-bottom: calc(var(--spacing-unit) * 4);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.credit-card-entry, .scenario-entry {
-    padding: 1.25rem;
-    margin-bottom: 1.5rem;
+.form-title { /* H2 for "Card 1", "Scenario 1" etc. */
+    font-size: 1.25rem; /* 20px */
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: calc(var(--spacing-unit) * 2.5);
+}
+
+/* --- Container Card Styling --- */
+.container-card {
+    background-color: var(--color-container-bg);
+    border-radius: var(--border-radius-base);
+    box-shadow: var(--box-shadow-soft);
+    padding: calc(var(--spacing-unit) * 3);
+    margin-bottom: calc(var(--spacing-unit) * 3);
+    border: 1px solid var(--color-border); /* Subtle border */
+}
+
+/* --- Form Elements --- */
+.form-group {
+    margin-bottom: calc(var(--spacing-unit) * 2);
+}
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+label {
+    display: block;
+    font-size: 0.9375rem; /* 15px */
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-unit);
+}
+
+input[type="text"],
+input[type="number"] {
+    width: 100%;
+    padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 1.5); /* 10px 12px */
+    font-size: 1rem; /* 16px */
+    font-family: var(--font-family-primary);
+    color: var(--color-text-primary);
+    background-color: var(--color-container-bg);
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius-sm);
-    background-color: var(--color-light); /* Slightly off-white to distinguish from section background */
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+input[type="text"]::placeholder,
+input[type="number"]::placeholder {
+    color: #AEB6BF; /* Lighter placeholder text */
+}
+input[type="text"]:focus,
+input[type="number"]:focus {
+    outline: none;
+    border-color: var(--color-input-focus-border);
+    box-shadow: 0 0 0 3px var(--color-input-focus-shadow);
 }
 
-.credit-card-entry h3, .scenario-entry h3 {
-    font-size: 1.15rem;
-    color: var(--color-primary); /* Use primary color for these sub-titles */
-    margin-bottom: 1rem;
-}
-
-/* Style for "Add" buttons */
-#add-card-btn, #add-scenario-btn {
-    background-color: var(--color-secondary); /* Green for add buttons */
-    border-color: var(--color-secondary);
-    font-size: 0.9rem;
-    padding: 0.4rem 0.8rem;
-}
-
-#add-card-btn:hover, #add-scenario-btn:hover {
-    background-color: var(--color-secondary-dark);
-    border-color: var(--color-secondary-dark);
-}
-
-/* --- Call to Action Button --- */
-#calculate-btn {
-    display: block; /* Make it block to center with margin auto */
-    min-width: 250px; /* Ensure a good minimum width */
-    margin: 1.5rem auto; /* Center it and provide vertical spacing */
-    padding: 0.75rem 1.5rem; /* Generous padding */
-    font-size: 1.2rem; /* Larger font size */
-    font-weight: 500;
-    background-color: var(--color-primary); /* Use primary color */
-    border-color: var(--color-primary);
-    text-transform: uppercase; /* Optional: for more emphasis */
-    letter-spacing: 0.5px; /* Optional */
-}
-
-#calculate-btn:hover {
-    background-color: var(--color-primary-dark);
-    border-color: var(--color-primary-dark);
-}
-
-/* --- Results Section Styling --- */
-#results-section {
-    /* The base section style (card-like) is already applied */
-    /* Override or add specific styles if needed */
-}
-
-#results-section .results-title {
+/* --- Buttons --- */
+.btn {
+    display: inline-flex; /* For aligning icon and text */
+    align-items: center;
+    justify-content: center;
+    padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 2.5); /* 10px 20px */
+    font-family: var(--font-family-primary);
+    font-size: 1rem; /* 16px */
+    font-weight: var(--font-weight-medium);
     text-align: center;
-    font-size: 2rem; /* Larger title for this main section */
-    color: var(--color-dark);
-    margin-bottom: 2rem; /* More space after this title */
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--color-border);
+    text-decoration: none;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid transparent;
+    border-radius: var(--border-radius-sm);
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+.btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--color-input-focus-shadow);
+}
+.btn:hover {
+    text-decoration: none;
 }
 
-#summary-charts-container {
-    padding: 1rem;
-    margin-bottom: 2rem;
-    /* background-color: var(--color-light); Optional: if want to nest visually */
-    /* border: 1px solid var(--color-border); */
-    /* border-radius: var(--border-radius-sm); */
+/* Primary Button (Action Color) */
+.btn-primary {
+    color: var(--color-white);
+    background-color: var(--color-primary-action);
+    border-color: var(--color-primary-action);
+}
+.btn-primary:hover {
+    background-color: var(--color-primary-action-darker);
+    border-color: var(--color-primary-action-darker);
+    color: var(--color-white);
 }
 
-#optimal-strategy-summary {
-    background-color: var(--color-success-bg);
-    border: 1px solid var(--color-success-border);
-    color: var(--color-success-text);
-    padding: 1.5rem;
-    margin-top: 1rem;
-    margin-bottom: 2.5rem; /* More space after this important summary */
-    border-radius: var(--border-radius-md);
+/* Secondary Button (Outlined) - To be defined later for Stage 2 */
+.btn-secondary {
+    color: var(--color-primary-action);
+    background-color: transparent;
+    border-color: var(--color-primary-action);
+}
+.btn-secondary:hover {
+    color: var(--color-white);
+    background-color: var(--color-primary-action);
+    border-color: var(--color-primary-action);
 }
 
-#optimal-strategy-summary h4 {
-    margin-top: 0;
-    color: var(--color-success-text); /* Ensure heading color matches text */
-    font-size: 1.3rem;
-    font-weight: 600;
+
+/* Specific button styling for Stage 1 */
+#add-card-btn {
+    /* Uses .btn and .btn-primary by default from HTML structure */
+    display: block; /* Make it full width or centered */
+    width: fit-content; /* Adjust width to content */
+    margin: calc(var(--spacing-unit) * 2.5) auto 0 auto; /* Center it */
+}
+.icon-add { /* Simple text plus for now, can be replaced with SVG */
+    margin-right: var(--spacing-unit);
+    font-weight: var(--font-weight-bold);
 }
 
-#optimal-strategy-summary p {
-    margin-bottom: 0.75rem;
-}
 
-#optimal-strategy-summary .explanation {
-    font-size: 0.9em;
-    opacity: 0.9;
-    margin-top: 1rem;
-}
-
-#results-section > h3 { /* For "Detailed Scenario Breakdowns" title */
-    font-size: 1.5rem;
-    color: var(--color-dark);
-    margin-top: 2rem;
-    margin-bottom: 1.5rem;
+/* --- Tooltip (Placeholder Styling) --- */
+.tooltip-trigger {
+    display: inline-block;
+    margin-left: var(--spacing-unit);
+    background-color: var(--color-text-secondary);
+    color: var(--color-container-bg);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
     text-align: center;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px dashed var(--color-border);
+    font-size: 0.8rem;
+    line-height: 20px;
+    cursor: help;
+    font-weight: var(--font-weight-bold);
+}
+/* Actual tooltip popover styling will be added when JS interaction is implemented */
+
+
+/* --- Stage 2: Scenarios Styling --- */
+#stage-2-scenarios .section-title { /* H2 for "Define Your Repayment Scenarios" */
+    font-size: 1.75rem; /* 28px */
+    font-weight: var(--font-weight-semibold);
+    text-align: center;
+    margin-bottom: calc(var(--spacing-unit) * 1.5);
 }
 
-.scenario-detail-container {
-    background-color: var(--color-white); /* Ensure it's on white if section bg is light gray */
-    padding: 1.5rem;
-    margin-bottom: 2rem;
+#stage-2-scenarios .info-text {
+    font-size: 1rem; /* 16px */
+    color: var(--color-text-secondary);
+    text-align: center;
+    margin-bottom: calc(var(--spacing-unit) * 3);
+    max-width: 550px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.baseline-info {
+    font-size: 1rem;
+    color: var(--color-text-primary);
+    background-color: var(--color-background); /* Slightly different background */
+    padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 2);
+    border-radius: var(--border-radius-sm);
+    margin-bottom: calc(var(--spacing-unit) * 3);
+    text-align: center;
     border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-md);
-    box-shadow: var(--shadow-sm);
+}
+.baseline-info strong {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-primary-action); /* Highlight the amount */
 }
 
-.scenario-detail-container h3 { /* Title for each detailed chart e.g. "Scenario 1: Paying $X/month" */
+#scenario-forms-container {
+    margin-bottom: calc(var(--spacing-unit) * 2);
+}
+
+.scenario-input-form {
+    /* Can add specific styling if different from .card-input-form-container */
+    /* For now, assuming it might be simpler, direct children of scenario-forms-container */
+    margin-bottom: calc(var(--spacing-unit) * 2.5);
+    padding: calc(var(--spacing-unit) * 2);
+    border: 1px dashed var(--color-border); /* Dashed border to differentiate from card forms */
+    border-radius: var(--border-radius-sm);
+}
+.scenario-input-form .form-title { /* h3 for "Scenario X" */
+     color: var(--color-primary-action); /* Using primary color for these titles as well */
+     margin-bottom: calc(var(--spacing-unit) * 1.5); /* Less margin than card form titles */
+     font-size: 1.1rem; /* Slightly smaller */
+}
+
+
+#add-scenario-btn {
+    /* Uses .btn and .btn-secondary by default from HTML structure */
+    display: block;
+    width: fit-content;
+    margin: calc(var(--spacing-unit) * 1.5) auto calc(var(--spacing-unit) * 4) auto; /* More bottom margin before CTA */
+}
+
+#calculate-btn.btn-cta { /* Main Call to Action Button */
+    display: block;
+    width: 100%; /* Full width within its container */
+    max-width: 320px; /* Max width for the button itself */
+    margin-left: auto;
+    margin-right: auto;
+    padding: calc(var(--spacing-unit) * 1.75) calc(var(--spacing-unit) * 3); /* 14px 24px - Larger padding */
+    font-size: 1.125rem; /* 18px - Larger font */
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: var(--box-shadow-lifted); /* More prominent shadow */
+}
+#calculate-btn.btn-cta:hover {
+    transform: translateY(-2px); /* Slight lift on hover */
+}
+
+
+/* --- Stage 3: Results Styling --- */
+#stage-3-results .section-title { /* H2 for "Your Repayment Options Explored" */
+    font-size: 1.75rem; /* 28px */
+    font-weight: var(--font-weight-semibold);
     text-align: center;
-    margin-bottom: 1.5rem;
-    font-size: 1.2rem;
-    color: var(--color-primary);
+    margin-bottom: calc(var(--spacing-unit) * 3); /* More space after title */
 }
 
-/* Removing the old, commented-out styles */
+#key-insight-callout.callout-accent {
+    background-color: var(--color-secondary-accent); /* Warm Yellow/Orange */
+    color: var(--color-text-primary); /* Ensure good contrast on yellow */
+    padding: calc(var(--spacing-unit) * 2.5) calc(var(--spacing-unit) * 3);
+    margin-bottom: calc(var(--spacing-unit) * 4);
+    text-align: center;
+    border: 1px solid var(--color-secondary-accent-darker);
+}
+#key-insight-callout p {
+    margin: 0;
+    font-size: 1.125rem; /* 18px */
+    font-weight: var(--font-weight-medium);
+}
+#key-insight-callout strong { /* For highlighting amounts/time saved */
+    font-weight: var(--font-weight-bold);
+}
+
+
+#scenario-comparison-cards-container {
+    display: flex;
+    flex-wrap: wrap; /* Allow cards to wrap on smaller screens */
+    gap: calc(var(--spacing-unit) * 2.5); /* Space between cards */
+    margin-bottom: calc(var(--spacing-unit) * 4);
+    justify-content: center; /* Center cards if they don't fill the row */
+}
+
+.scenario-summary-card {
+    /* .container-card styles are already applied via HTML */
+    flex-basis: calc(33.333% - calc(var(--spacing-unit) * 2.5 * 2 / 3)); /* Aim for 3 cards per row, adjusting for gap */
+    min-width: 280px; /* Minimum width before wrapping */
+    position: relative; /* For badge positioning */
+    display: flex;
+    flex-direction: column;
+}
+.scenario-summary-card .scenario-title { /* h3 */
+    font-size: 1.1rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-primary-action);
+    margin-bottom: calc(var(--spacing-unit) * 2);
+    text-align: center;
+}
+.scenario-summary-card .metric {
+    font-size: 0.9375rem; /* 15px */
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-unit);
+}
+.scenario-summary-card .metric strong {
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-medium);
+}
+.scenario-summary-card .metric .metric-value { /* Span holding the actual value */
+    /* Can add specific styling if needed */
+}
+.scenario-summary-card .metric .metric-interest-paid {
+    color: var(--color-alert-negative); /* Use alert color for high interest */
+    font-weight: var(--font-weight-semibold);
+}
+.scenario-summary-card .details-link {
+    display: inline-block;
+    margin-top: auto; /* Push to bottom of card */
+    padding-top: var(--spacing-unit);
+    font-size: 0.875rem;
+    font-weight: var(--font-weight-medium);
+    text-align: center;
+    color: var(--color-primary-action);
+}
+.scenario-summary-card .details-link:hover {
+    text-decoration: underline;
+}
+
+/* Recommended Badge */
+.scenario-badge {
+    position: absolute;
+    top: -1px; /* Align with top border */
+    right: calc(var(--spacing-unit) * 2);
+    background-color: var(--color-primary-action);
+    color: var(--color-white);
+    padding: calc(var(--spacing-unit) * 0.5) var(--spacing-unit);
+    font-size: 0.75rem; /* 12px */
+    font-weight: var(--font-weight-semibold);
+    border-radius: 0 0 var(--border-radius-sm) var(--border-radius-sm); /* Rounded bottom corners */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.scenario-summary-card.is-recommended { /* Class added by JS */
+    border-color: var(--color-primary-action);
+    box-shadow: 0 0 0 2px var(--color-primary-action), var(--box-shadow-lifted); /* Highlight border and stronger shadow */
+}
+
+
+#comparative-bar-chart-container .chart-title { /* h3 */
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: calc(var(--spacing-unit) * 2);
+}
+#comparative-bar-chart-container canvas {
+    max-height: 400px; /* Prevent chart from becoming too tall */
+}
+
+
+#detailed-breakdown-accordion-container {
+    margin-top: calc(var(--spacing-unit) * 4);
+}
+/* Accordion item styling will be more complex and added with JS interactions */
+.accordion-item { /* Placeholder */
+    border: 1px solid var(--color-border);
+    margin-bottom: var(--spacing-unit);
+    border-radius: var(--border-radius-sm);
+}
+.accordion-header { /* Placeholder */
+    background-color: var(--color-background);
+    padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
+    cursor: pointer;
+}
+.accordion-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: var(--font-weight-medium);
+}
+.accordion-content { /* Placeholder */
+    padding: calc(var(--spacing-unit) * 1.5);
+    border-top: 1px solid var(--color-border);
+    /* Initially hidden by JS */
+}
+.strategy-explanation {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    margin-bottom: calc(var(--spacing-unit) * 1.5);
+    font-style: italic;
+}
+.table-responsive {
+    overflow-x: auto; /* For small screens if table is wide */
+}
+.month-by-month-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+.month-by-month-table th, .month-by-month-table td {
+    border: 1px solid var(--color-border);
+    padding: var(--spacing-unit);
+    text-align: left;
+}
+.month-by-month-table th {
+    background-color: var(--color-background);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-secondary);
+}
+/* End of Stage 3 styling */
+
+
+/* --- Animations & Transitions --- */
+.stage {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+.stage.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Basic Spinner for loading button state */
+.spinner {
+    display: inline-block;
+    width: 1em; /* Relative to button font size */
+    height: 1em;
+    margin-right: 0.5em;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: var(--color-white);
+    animation: spin 1s ease-in-out infinite;
+    vertical-align: middle; /* Align with text */
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* --- Tooltip Popup Styling --- */
+.info-tooltip-popup {
+    position: absolute; /* Positioned by JS */
+    background-color: var(--color-text-primary);
+    color: var(--color-container-bg);
+    padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
+    border-radius: var(--border-radius-sm);
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.4;
+    z-index: 1000; /* Ensure it's on top */
+    box-shadow: var(--box-shadow-soft);
+    max-width: 250px;
+    display: none; /* Hidden by default, shown by JS */
+    pointer-events: none; /* Prevent tooltip from interfering with mouse events */
+}
+
+/* --- Accordion Styling (Basic for now, can be enhanced) --- */
+.accordion-item {
+    /* Existing styles are fine, add transition for content */
+}
+.accordion-content {
+    /* Existing styles */
+    display: none; /* Hidden by default */
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+    max-height: 0; /* For transition */
+    padding-top: 0;
+    padding-bottom: 0;
+}
+.accordion-item.is-active .accordion-content {
+    display: block; /* Shown by JS by adding is-active to accordion-item */
+    max-height: 2000px; /* Large enough value for content */
+    padding-top: calc(var(--spacing-unit) * 1.5);
+    padding-bottom: calc(var(--spacing-unit) * 1.5);
+}
+.accordion-header {
+    transition: background-color 0.2s ease;
+}
+.accordion-header:hover {
+    background-color: #e9ecef; /* Slightly darker than --color-background */
+}
+.accordion-header h4 { /* Ensure header text is aligned well */
+    line-height: 1.4;
+}
+
+.metric-interest-alert { /* Class for high interest values in summary cards */
+    color: var(--color-alert-negative) !important; /* Ensure it overrides other styles */
+    font-weight: var(--font-weight-semibold) !important;
+}
+
+.scenario-summary-card.is-recommended {
+    border-width: 2px; /* Make border thicker for recommended */
+    box-shadow: 0 0 0 3px var(--color-primary-action), var(--box-shadow-lifted); /* More prominent outer glow + existing shadow */
+}
+.scenario-badge.recommended-badge {
+    top: 0; /* Align with the very top of the card if border is thicker */
+    right: calc(var(--spacing-unit) * 1.5); /* Adjust if padding/border changes affect position */
+    border-radius: 0 0 var(--border-radius-sm) var(--border-radius-sm);
+}
+
+/* Ensure tooltip trigger is vertically aligned with text if next to an input */
+.form-group input[type="number"] + .tooltip-trigger {
+    vertical-align: middle; /* Try to align with the input's text baseline */
+    position: relative;
+    top: -2px; /* Fine-tune vertical alignment */
+}
+
+/* Polish for main CTA button text when spinner is active */
+#calculate-btn .spinner + span {
+    vertical-align: middle;
+}
+#calculate-btn:disabled {
+    opacity: 0.8; /* Slightly dim disabled button */
+}
+
+/* Ensure stages take up space even when content is minimal for transition */
+.stage {
+    min-height: 100px; /* Or some other appropriate value */
+}
+#stage-3-results.is-visible { /* Ensure results stage also has some min height if needed */
+    min-height: 300px;
+}
