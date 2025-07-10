@@ -1,603 +1,695 @@
-/* Stylesheet for Credit Card Debt Visualizer - V2 Design */
+/* V3 Design - Credit Card Debt Visualizer */
 
-/* --- Variables --- */
+/* --- CSS Variables (Root) --- */
 :root {
-    /* Color Palette */
-    --color-primary-action: #007BFF; /* Motivating Blue */
-    --color-primary-action-darker: #0056b3;
-    --color-secondary-accent: #FFC107; /* Warm Yellow/Orange */
-    --color-secondary-accent-darker: #d39e00;
-    --color-background: #F8F9FA; /* Off-white */
-    --color-container-bg: #FFFFFF;
-    --color-text-primary: #212529; /* Dark Gray */
-    --color-text-secondary: #6C757D; /* Medium Gray for labels, secondary text */
-    --color-border: #DEE2E6; /* Light Gray for borders */
-    --color-input-focus-border: var(--color-primary-action);
-    --color-input-focus-shadow: rgba(0, 123, 255, 0.25);
-    --color-alert-negative: #DC3545; /* Red/Coral */
-    --color-white: #FFFFFF;
+    /* Color Palette V3 */
+    --color-primary: #007BFF; /* Empowering Blue */
+    --color-primary-darker: #0056b3; /* For hover states */
+    --color-secondary: #1C3D5A; /* Deep Navy */
+    --color-accent-good: #228B22; /* Darker Savings Green (ForestGreen) - WCAG AA on white for text */
+    --color-accent-good-bg: #28A745; /* Original Savings Green for backgrounds */
+    --color-accent-warning: #E67300; /* Darker Interest Orange - WCAG AA on white for text */
+    --color-accent-warning-bg: #FD7E14; /* Original Interest Orange for chart fills etc. */
+    --color-alert-negative: #DC3545; /* For destructive actions or negative highlights */
 
-    /* Typography */
-    --font-family-primary: 'Inter', 'Lato', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --font-weight-normal: 400;
+    --color-text-primary: #343A40; /* Dark Gray */
+    --color-text-secondary: #6C757D; /* Medium Gray */
+    --color-text-on-primary: #FFFFFF; /* White text on primary buttons */
+    --color-text-on-dark-bg: #FFFFFF; /* White text on dark backgrounds (e.g. tooltips) */
+
+    --color-background-page: #F8F9FA; /* Light Gray */
+    --color-background-card: #FFFFFF; /* White */
+    --color-border: #DEE2E6; /* Border Gray */
+    --color-input-focus-shadow: rgba(0, 123, 255, 0.25);
+
+    /* Typography V3 */
+    --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-size-base: 16px;
+    --line-height-base: 1.6;
+
+    --font-weight-regular: 400;
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
-    --line-height-base: 1.6; /* Adjusted from 1.5 for better readability */
 
-    /* Spacing & Sizing */
+    --h1-font-size: 2rem;   /* 32px */
+    --h2-font-size: 1.5rem; /* 24px */
+    --h3-font-size: 1.25rem;/* 20px */
+    --label-font-size: 0.875rem; /* 14px */
+
+    /* Layout & Spacing V3 */
     --spacing-unit: 8px;
-    --border-radius-base: 8px; /* Slightly larger for a softer look */
-    --border-radius-sm: 4px;
-
-    /* Shadows */
-    --box-shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --box-shadow-lifted: 0 6px 16px rgba(0, 0, 0, 0.12);
+    --container-max-width: 1140px;
+    --border-radius-base: 8px;  /* For inputs, buttons */
+    --border-radius-card: 12px; /* For cards */
+    --box-shadow-card: 0 4px 6px rgba(0,0,0,0.05);
 }
 
-/* --- Base & Body --- */
+/* --- Base & Body Styles --- */
 html {
     box-sizing: border-box;
-    font-size: 16px; /* Base font size for rem units */
+    font-size: var(--font-size-base);
 }
 *, *:before, *:after {
     box-sizing: inherit;
 }
 
 body {
-    font-family: var(--font-family-primary);
-    font-weight: var(--font-weight-normal);
+    font-family: var(--font-family-base);
+    font-weight: var(--font-weight-regular);
     line-height: var(--line-height-base);
     color: var(--color-text-primary);
-    background-color: var(--color-background);
+    background-color: var(--color-background-page);
     margin: 0;
-    padding: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
 /* --- Main Layout Containers --- */
-header { /* Simple header as per new structure */
-    padding: calc(var(--spacing-unit) * 2) 0;
-    text-align: center;
+.container {
+    width: 100%;
+    max-width: var(--container-max-width);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: calc(var(--spacing-unit) * 2); /* 16px */
+    padding-right: calc(var(--spacing-unit) * 2); /* 16px */
+}
+
+.site-header {
+    background-color: var(--color-background-card); /* White header */
+    padding: var(--spacing-unit) 0; /* Minimal padding */
     border-bottom: 1px solid var(--color-border);
-    background-color: var(--color-container-bg);
-}
-#main-title { /* Title in the header */
-    font-size: 1.5rem; /* 24px */
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-text-secondary);
-    margin: 0;
+    /* Minimal header, branding/logo could go here */
 }
 
-main {
-    max-width: 800px; /* Max width for content area */
-    margin: calc(var(--spacing-unit) * 4) auto;
-    padding: 0 calc(var(--spacing-unit) * 2);
+.site-main {
+    padding-top: calc(var(--spacing-unit) * 4); /* 32px */
+    padding-bottom: calc(var(--spacing-unit) * 4); /* 32px */
 }
 
-footer {
-    text-align: center;
-    padding: calc(var(--spacing-unit) * 3) 0;
-    margin-top: calc(var(--spacing-unit) * 6);
+.site-footer {
+    background-color: var(--color-background-card);
+    padding: calc(var(--spacing-unit) * 2) 0; /* 16px */
+    margin-top: calc(var(--spacing-unit) * 6); /* 48px */
     border-top: 1px solid var(--color-border);
-    font-size: 0.875rem; /* 14px */
+    text-align: center;
+    font-size: var(--label-font-size);
     color: var(--color-text-secondary);
 }
-footer a {
-    color: var(--color-primary-action);
+.site-footer a {
+    color: var(--color-primary);
+    text-decoration: none;
 }
-footer a:hover {
-    color: var(--color-primary-action-darker);
-}
-
-
-/* --- Typography --- */
-h1, h2, h3, h4, p {
-    margin-top: 0;
+.site-footer a:hover {
+    text-decoration: underline;
+    color: var(--color-primary-darker);
 }
 
-.page-title { /* H1 in Stage 1 */
-    font-size: 2.25rem; /* 36px */
+/* --- Typography Base --- */
+h1, .h1-style { /* Allow using class for h1 styling if semantic element is different */
+    font-size: var(--h1-font-size);
     font-weight: var(--font-weight-bold);
-    color: var(--color-text-primary);
-    text-align: center;
-    margin-bottom: calc(var(--spacing-unit) * 1.5);
+    color: var(--color-secondary); /* Deep Navy */
+    margin-bottom: calc(var(--spacing-unit) * 2); /* 16px */
+    line-height: 1.3;
+}
+h2, .h2-style {
+    font-size: var(--h2-font-size);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-secondary); /* Deep Navy */
+    margin-bottom: calc(var(--spacing-unit) * 2); /* 16px */
+    line-height: 1.3;
+}
+h3, .h3-style {
+    font-size: var(--h3-font-size);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-secondary); /* Deep Navy */
+    margin-bottom: var(--spacing-unit); /* 8px */
+    line-height: 1.4;
 }
 
-.intro-paragraph {
+p {
+    margin-top: 0;
+    margin-bottom: calc(var(--spacing-unit) * 2); /* 16px */
+}
+p.page-intro {
     font-size: 1.125rem; /* 18px */
     color: var(--color-text-secondary);
     text-align: center;
-    margin-bottom: calc(var(--spacing-unit) * 4);
-    max-width: 600px;
+    max-width: 700px;
     margin-left: auto;
     margin-right: auto;
-}
-
-.form-title { /* H2 for "Card 1", "Scenario 1" etc. */
-    font-size: 1.25rem; /* 20px */
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-text-primary);
-    margin-bottom: calc(var(--spacing-unit) * 2.5);
-}
-
-/* --- Container Card Styling --- */
-.container-card {
-    background-color: var(--color-container-bg);
-    border-radius: var(--border-radius-base);
-    box-shadow: var(--box-shadow-soft);
-    padding: calc(var(--spacing-unit) * 3);
-    margin-bottom: calc(var(--spacing-unit) * 3);
-    border: 1px solid var(--color-border); /* Subtle border */
-}
-
-/* --- Form Elements --- */
-.form-group {
-    margin-bottom: calc(var(--spacing-unit) * 2);
-}
-.form-group:last-child {
-    margin-bottom: 0;
+    margin-bottom: calc(var(--spacing-unit) * 4); /* 32px */
 }
 
 label {
     display: block;
-    font-size: 0.9375rem; /* 15px */
+    font-size: var(--label-font-size);
     font-weight: var(--font-weight-medium);
-    color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-unit);
+    color: var(--color-text-secondary); /* Medium Gray from spec */
+    margin-bottom: calc(var(--spacing-unit) * 0.75); /* 6px */
+}
+
+/* --- Utility Classes (can be expanded) --- */
+.text-center {
+    text-align: center;
+}
+
+/* --- Input Section (Two Columns) --- */
+.input-section-wrapper {
+    display: flex;
+    flex-wrap: wrap; /* Allow columns to wrap on smaller screens */
+    gap: calc(var(--spacing-unit) * 4); /* 32px gap between columns */
+    margin-bottom: calc(var(--spacing-unit) * 4); /* 32px */
+}
+
+.input-column {
+    flex: 1; /* Each column takes equal space */
+    min-width: 300px; /* Minimum width before wrapping */
+    /* The "card" styling for the column itself might be too much if individual items are cards.
+       Let's assume the column is just a container, and items within are cards. */
+}
+
+.column-title { /* H2 within each input column */
+    font-size: var(--h2-font-size); /* Already defined */
+    color: var(--color-secondary); /* Deep Navy */
+    margin-bottom: calc(var(--spacing-unit) * 3); /* 24px */
+    padding-bottom: var(--spacing-unit); /* 8px */
+    border-bottom: 2px solid var(--color-border);
+}
+
+/* Card styling for individual credit card entries */
+.credit-card-item-card { /* This class will be added by JS to dynamically created card forms */
+    background-color: var(--color-background-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-card);
+    box-shadow: var(--box-shadow-card);
+    padding: calc(var(--spacing-unit) * 3); /* 24px */
+    margin-bottom: calc(var(--spacing-unit) * 3); /* 24px */
+}
+.credit-card-item-card .form-title { /* h3 for "Card X" */
+    font-size: var(--h3-font-size);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-primary); /* Use primary for these sub-titles */
+    margin-bottom: calc(var(--spacing-unit) * 2); /* 16px */
+}
+
+/* Styling for individual scenario input groups (if they need to be card-like) */
+.scenario-input-item { /* This class will be added by JS for each scenario input group */
+    background-color: var(--color-background-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-card);
+    box-shadow: var(--box-shadow-card);
+    padding: calc(var(--spacing-unit) * 2.5); /* 20px */
+    margin-bottom: calc(var(--spacing-unit) * 2.5); /* 20px */
+}
+.scenario-input-item label { /* Make label a bit more prominent for scenarios */
+    font-weight: var(--font-weight-medium);
+}
+
+
+/* Form Group & Input Fields (V3 specific refinements) */
+.form-group {
+    margin-bottom: calc(var(--spacing-unit) * 2); /* 16px */
+}
+.form-group:last-of-type { /* Remove bottom margin from last group in a card */
+    margin-bottom: 0;
 }
 
 input[type="text"],
 input[type="number"] {
-    width: 100%;
-    padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 1.5); /* 10px 12px */
-    font-size: 1rem; /* 16px */
-    font-family: var(--font-family-primary);
-    color: var(--color-text-primary);
-    background-color: var(--color-container-bg);
+    background-color: var(--color-background-card); /* White */
     border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-sm);
+    border-radius: var(--border-radius-base); /* 8px */
+    padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 1.5); /* 12px */
+    width: 100%;
+    font-size: var(--font-size-base);
+    color: var(--color-text-primary);
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-input[type="text"]::placeholder,
-input[type="number"]::placeholder {
-    color: #AEB6BF; /* Lighter placeholder text */
 }
 input[type="text"]:focus,
 input[type="number"]:focus {
     outline: none;
-    border-color: var(--color-input-focus-border);
+    border-color: var(--color-primary);
     box-shadow: 0 0 0 3px var(--color-input-focus-shadow);
 }
+input[type="text"]::placeholder,
+input[type="number"]::placeholder {
+    color: var(--color-text-secondary);
+    opacity: 0.7;
+}
+/* Error state for inputs (to be applied by JS) */
+input.is-invalid {
+    border-color: var(--color-alert-negative);
+}
+input.is-invalid:focus {
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25); /* Red shadow for error focus */
+}
 
-/* --- Buttons --- */
+
+/* Buttons (V3 specific refinements) */
 .btn {
-    display: inline-flex; /* For aligning icon and text */
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 2.5); /* 10px 20px */
-    font-family: var(--font-family-primary);
-    font-size: 1rem; /* 16px */
+    font-family: var(--font-family-base);
     font-weight: var(--font-weight-medium);
     text-align: center;
-    text-decoration: none;
-    white-space: nowrap;
     vertical-align: middle;
     cursor: pointer;
     user-select: none;
     border: 1px solid transparent;
-    border-radius: var(--border-radius-sm);
+    padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 3); /* 12px 24px */
+    font-size: var(--font-size-base); /* 16px */
+    line-height: var(--line-height-base);
+    border-radius: var(--border-radius-base); /* 8px */
     transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 .btn:focus {
     outline: none;
-    box-shadow: 0 0 0 3px var(--color-input-focus-shadow);
+    box-shadow: 0 0 0 3px var(--color-input-focus-shadow); /* Default to primary focus color */
 }
-.btn:hover {
-    text-decoration: none;
+.btn .btn-icon { /* For icons inside buttons */
+    margin-right: var(--spacing-unit);
+    /* Icon styling (size, color) will depend on library or SVG used */
 }
 
-/* Primary Button (Action Color) */
 .btn-primary {
-    color: var(--color-white);
-    background-color: var(--color-primary-action);
-    border-color: var(--color-primary-action);
+    background-color: var(--color-primary);
+    color: var(--color-text-on-primary);
+    border-color: var(--color-primary);
 }
 .btn-primary:hover {
-    background-color: var(--color-primary-action-darker);
-    border-color: var(--color-primary-action-darker);
-    color: var(--color-white);
+    background-color: var(--color-primary-darker);
+    border-color: var(--color-primary-darker);
+    color: var(--color-text-on-primary);
+}
+.btn-primary:focus {
+    box-shadow: 0 0 0 3px var(--color-input-focus-shadow);
 }
 
-/* Secondary Button (Outlined) - To be defined later for Stage 2 */
 .btn-secondary {
-    color: var(--color-primary-action);
-    background-color: transparent;
-    border-color: var(--color-primary-action);
+    background-color: var(--color-background-card); /* White */
+    color: var(--color-primary);
+    border-color: var(--color-primary);
 }
 .btn-secondary:hover {
-    color: var(--color-white);
-    background-color: var(--color-primary-action);
-    border-color: var(--color-primary-action);
+    background-color: var(--color-background-page); /* Light Gray */
+    color: var(--color-primary-darker);
+    border-color: var(--color-primary-darker);
+}
+.btn-secondary:focus {
+     box-shadow: 0 0 0 3px var(--color-input-focus-shadow);
 }
 
-
-/* Specific button styling for Stage 1 */
-#add-card-btn {
-    /* Uses .btn and .btn-primary by default from HTML structure */
-    display: block; /* Make it full width or centered */
-    width: fit-content; /* Adjust width to content */
-    margin: calc(var(--spacing-unit) * 2.5) auto 0 auto; /* Center it */
+.btn-destructive { /* For "Remove" buttons */
+    background-color: var(--color-background-card);
+    color: var(--color-alert-negative);
+    border-color: var(--color-alert-negative);
 }
-.icon-add { /* Simple text plus for now, can be replaced with SVG */
-    margin-right: var(--spacing-unit);
-    font-weight: var(--font-weight-bold);
+.btn-destructive:hover {
+    background-color: var(--color-alert-negative);
+    color: var(--color-text-on-primary);
+    border-color: var(--color-alert-negative);
+}
+.btn-destructive:focus {
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25); /* Red shadow */
 }
 
-
-/* --- Tooltip (Placeholder Styling) --- */
-.tooltip-trigger {
-    display: inline-block;
-    margin-left: var(--spacing-unit);
-    background-color: var(--color-text-secondary);
-    color: var(--color-container-bg);
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
+.btn-add-item { /* For "+ Add Another Card/Scenario" */
+    display: block; /* Make it take full width of its column or a defined width */
+    width: 100%;
+    margin-top: calc(var(--spacing-unit) * 2); /* 16px */
     text-align: center;
-    font-size: 0.8rem;
-    line-height: 20px;
-    cursor: help;
-    font-weight: var(--font-weight-bold);
-}
-/* Actual tooltip popover styling will be added when JS interaction is implemented */
-
-
-/* --- Stage 2: Scenarios Styling --- */
-#stage-2-scenarios .section-title { /* H2 for "Define Your Repayment Scenarios" */
-    font-size: 1.75rem; /* 28px */
-    font-weight: var(--font-weight-semibold);
-    text-align: center;
-    margin-bottom: calc(var(--spacing-unit) * 1.5);
+    font-weight: var(--font-weight-medium);
 }
 
-#stage-2-scenarios .info-text {
-    font-size: 1rem; /* 16px */
-    color: var(--color-text-secondary);
-    text-align: center;
-    margin-bottom: calc(var(--spacing-unit) * 3);
-    max-width: 550px;
-    margin-left: auto;
-    margin-right: auto;
+.calculate-cta-wrapper {
+    text-align: center; /* Center the button within this wrapper */
+    margin-top: calc(var(--spacing-unit) * 4); /* 32px */
+    margin-bottom: calc(var(--spacing-unit) * 4); /* 32px */
 }
-
-.baseline-info {
-    font-size: 1rem;
-    color: var(--color-text-primary);
-    background-color: var(--color-background); /* Slightly different background */
-    padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 2);
-    border-radius: var(--border-radius-sm);
-    margin-bottom: calc(var(--spacing-unit) * 3);
-    text-align: center;
-    border: 1px solid var(--color-border);
-}
-.baseline-info strong {
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-primary-action); /* Highlight the amount */
-}
-
-#scenario-forms-container {
-    margin-bottom: calc(var(--spacing-unit) * 2);
-}
-
-.scenario-input-form {
-    /* Can add specific styling if different from .card-input-form-container */
-    /* For now, assuming it might be simpler, direct children of scenario-forms-container */
-    margin-bottom: calc(var(--spacing-unit) * 2.5);
-    padding: calc(var(--spacing-unit) * 2);
-    border: 1px dashed var(--color-border); /* Dashed border to differentiate from card forms */
-    border-radius: var(--border-radius-sm);
-}
-.scenario-input-form .form-title { /* h3 for "Scenario X" */
-     color: var(--color-primary-action); /* Using primary color for these titles as well */
-     margin-bottom: calc(var(--spacing-unit) * 1.5); /* Less margin than card form titles */
-     font-size: 1.1rem; /* Slightly smaller */
-}
-
-
-#add-scenario-btn {
-    /* Uses .btn and .btn-secondary by default from HTML structure */
-    display: block;
-    width: fit-content;
-    margin: calc(var(--spacing-unit) * 1.5) auto calc(var(--spacing-unit) * 4) auto; /* More bottom margin before CTA */
-}
-
-#calculate-btn.btn-cta { /* Main Call to Action Button */
-    display: block;
-    width: 100%; /* Full width within its container */
-    max-width: 320px; /* Max width for the button itself */
-    margin-left: auto;
-    margin-right: auto;
-    padding: calc(var(--spacing-unit) * 1.75) calc(var(--spacing-unit) * 3); /* 14px 24px - Larger padding */
-    font-size: 1.125rem; /* 18px - Larger font */
-    font-weight: var(--font-weight-semibold);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    box-shadow: var(--box-shadow-lifted); /* More prominent shadow */
-}
-#calculate-btn.btn-cta:hover {
-    transform: translateY(-2px); /* Slight lift on hover */
-}
-
-
-/* --- Stage 3: Results Styling --- */
-#stage-3-results .section-title { /* H2 for "Your Repayment Options Explored" */
-    font-size: 1.75rem; /* 28px */
-    font-weight: var(--font-weight-semibold);
-    text-align: center;
-    margin-bottom: calc(var(--spacing-unit) * 3); /* More space after title */
-}
-
-#key-insight-callout.callout-accent {
-    background-color: var(--color-secondary-accent); /* Warm Yellow/Orange */
-    color: var(--color-text-primary); /* Ensure good contrast on yellow */
-    padding: calc(var(--spacing-unit) * 2.5) calc(var(--spacing-unit) * 3);
-    margin-bottom: calc(var(--spacing-unit) * 4);
-    text-align: center;
-    border: 1px solid var(--color-secondary-accent-darker);
-}
-#key-insight-callout p {
-    margin: 0;
+.btn-calculate-cta { /* The main "Calculate Scenarios" button */
+    padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 4); /* 16px 32px - larger */
     font-size: 1.125rem; /* 18px */
+    font-weight: var(--font-weight-semibold);
+    /* Icon would go here if specified */
+}
+
+/* --- Results Section (V3) --- */
+.results-section-wrapper {
+    /* Base .card styling is not applied here, it's a full-width section container */
+    margin-top: calc(var(--spacing-unit) * 5); /* 40px */
+    padding-top: calc(var(--spacing-unit) * 3); /* 24px */
+    border-top: 1px solid var(--color-border); /* Separator from input section */
+}
+
+.results-section-wrapper .section-title { /* H2 "Here's Your Repayment Plan Comparison" */
+    text-align: center;
+    margin-bottom: calc(var(--spacing-unit) * 4); /* 32px */
+}
+
+#results-summary-card { /* This is a .card styled element */
+    padding: calc(var(--spacing-unit) * 3); /* 24px */
+    margin-bottom: calc(var(--spacing-unit) * 4); /* 32px */
+}
+/* Styles for #optimal-strategy-highlight and #savings-insight-text (dynamic content) */
+#optimal-strategy-highlight {
+    background-color: var(--color-accent-good-bg); /* Original Savings Green for BG */
+    color: var(--color-text-on-primary); /* White text on this green is now borderline, check. Original green #28A745 with white is 3.9:1. Needs to be dark text or darker green. */
+    /* Let's use a darker text for this background, or ensure the green is dark enough for white text. */
+    /* Design doc implies text on this is white. So, green BG must be dark enough. */
+    /* If --color-accent-good-bg (#28A745) is used, white text is NOT AA. */
+    /* Let's use --color-accent-good (#228B22) as background for this to make white text AA compliant (4.6:1) */
+    background-color: var(--color-accent-good); /* Darker Green for BG */
+    color: var(--color-text-on-primary); /* White text on darker green */
+    padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 2.5); /* 16px 20px */
+    border-radius: var(--border-radius-base);
+    margin-bottom: calc(var(--spacing-unit) * 2); /* 16px */
+    text-align: center;
+    font-size: 1.1rem; /* Slightly larger for emphasis */
     font-weight: var(--font-weight-medium);
 }
-#key-insight-callout strong { /* For highlighting amounts/time saved */
+#optimal-strategy-highlight strong {
     font-weight: var(--font-weight-bold);
 }
-
-
-#scenario-comparison-cards-container {
-    display: flex;
-    flex-wrap: wrap; /* Allow cards to wrap on smaller screens */
-    gap: calc(var(--spacing-unit) * 2.5); /* Space between cards */
-    margin-bottom: calc(var(--spacing-unit) * 4);
-    justify-content: center; /* Center cards if they don't fill the row */
-}
-
-.scenario-summary-card {
-    /* .container-card styles are already applied via HTML */
-    flex-basis: calc(33.333% - calc(var(--spacing-unit) * 2.5 * 2 / 3)); /* Aim for 3 cards per row, adjusting for gap */
-    min-width: 280px; /* Minimum width before wrapping */
-    position: relative; /* For badge positioning */
-    display: flex;
-    flex-direction: column;
-}
-.scenario-summary-card .scenario-title { /* h3 */
-    font-size: 1.1rem;
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-primary-action);
-    margin-bottom: calc(var(--spacing-unit) * 2);
+#savings-insight-text {
     text-align: center;
-}
-.scenario-summary-card .metric {
-    font-size: 0.9375rem; /* 15px */
+    font-size: 1rem;
     color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-unit);
+    margin-bottom: calc(var(--spacing-unit) * 3); /* 24px */
 }
-.scenario-summary-card .metric strong {
-    color: var(--color-text-primary);
-    font-weight: var(--font-weight-medium);
-}
-.scenario-summary-card .metric .metric-value { /* Span holding the actual value */
-    /* Can add specific styling if needed */
-}
-.scenario-summary-card .metric .metric-interest-paid {
-    color: var(--color-alert-negative); /* Use alert color for high interest */
+#savings-insight-text strong {
+    color: var(--color-accent-good); /* Savings Green for saved amount */
     font-weight: var(--font-weight-semibold);
 }
-.scenario-summary-card .details-link {
-    display: inline-block;
-    margin-top: auto; /* Push to bottom of card */
-    padding-top: var(--spacing-unit);
-    font-size: 0.875rem;
-    font-weight: var(--font-weight-medium);
-    text-align: center;
-    color: var(--color-primary-action);
-}
-.scenario-summary-card .details-link:hover {
-    text-decoration: underline;
-}
 
-/* Recommended Badge */
-.scenario-badge {
-    position: absolute;
-    top: -1px; /* Align with top border */
-    right: calc(var(--spacing-unit) * 2);
-    background-color: var(--color-primary-action);
-    color: var(--color-white);
-    padding: calc(var(--spacing-unit) * 0.5) var(--spacing-unit);
-    font-size: 0.75rem; /* 12px */
-    font-weight: var(--font-weight-semibold);
-    border-radius: 0 0 var(--border-radius-sm) var(--border-radius-sm); /* Rounded bottom corners */
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+
+#results-summary-card .chart-container {
+    margin-top: calc(var(--spacing-unit) * 2); /* 16px */
+    position: relative; /* For Chart.js responsiveness */
+    height: 350px; /* Default height, can be adjusted */
+    width: 100%;
 }
-.scenario-summary-card.is-recommended { /* Class added by JS */
-    border-color: var(--color-primary-action);
-    box-shadow: 0 0 0 2px var(--color-primary-action), var(--box-shadow-lifted); /* Highlight border and stronger shadow */
+#scenarioComparisonBarChart { /* The canvas itself */
+    /* Chart.js will handle its sizing within the container */
 }
 
 
-#comparative-bar-chart-container .chart-title { /* h3 */
-    text-align: center;
-    font-size: 1.25rem;
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-text-primary);
-    margin-bottom: calc(var(--spacing-unit) * 2);
+/* Detailed Scenario Breakdown (Tabs V3) */
+.detailed-breakdown-tabs {
+    margin-top: calc(var(--spacing-unit) * 4); /* 32px */
 }
-#comparative-bar-chart-container canvas {
-    max-height: 400px; /* Prevent chart from becoming too tall */
+.tab-list-container {
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: 2px solid var(--color-border);
+    margin-bottom: calc(var(--spacing-unit) * 0); /* No margin, content below will have it */
 }
-
-
-#detailed-breakdown-accordion-container {
-    margin-top: calc(var(--spacing-unit) * 4);
-}
-/* Accordion item styling will be more complex and added with JS interactions */
-.accordion-item { /* Placeholder */
-    border: 1px solid var(--color-border);
-    margin-bottom: var(--spacing-unit);
-    border-radius: var(--border-radius-sm);
-}
-.accordion-header { /* Placeholder */
-    background-color: var(--color-background);
-    padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
+.tab-button { /* Dynamically added by JS */
+    background-color: transparent;
+    border: none;
+    border-bottom: 3px solid transparent; /* For active state */
+    padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 2.5); /* 12px 20px */
     cursor: pointer;
-}
-.accordion-header h4 {
-    margin: 0;
-    font-size: 1.1rem;
+    font-family: var(--font-family-base);
+    font-size: 1rem; /* 16px */
     font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    margin-bottom: -2px; /* Overlap border-bottom of container for seamless active tab */
+    transition: color 0.15s ease-in-out, border-color 0.15s ease-in-out;
 }
-.accordion-content { /* Placeholder */
+.tab-button:hover {
+    color: var(--color-primary);
+}
+.tab-button.is-active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+    font-weight: var(--font-weight-semibold);
+}
+.tab-button:focus {
+    outline: none;
+    background-color: var(--color-background-page); /* Subtle focus for tabs */
+    border-radius: var(--border-radius-base) var(--border-radius-base) 0 0;
+}
+
+.tab-content-panel { /* Dynamically added by JS, one per tab */
+    display: none; /* Hidden by default, shown by JS */
+    padding: calc(var(--spacing-unit) * 3) 0; /* Padding top/bottom, no horizontal as card will have it */
+                                            /* Or, if content panel is the card: */
+                                            /* padding: calc(var(--spacing-unit) * 3); */
+                                            /* background-color: var(--color-background-card); */
+                                            /* border: 1px solid var(--color-border); */
+                                            /* border-top: none; */
+                                            /* border-radius: 0 0 var(--border-radius-card) var(--border-radius-card); */
+                                            /* box-shadow: var(--box-shadow-card); */
+}
+.tab-content-panel.is-active {
+    display: block;
+    animation: fadeIn 0.5s ease-out; /* Simple fade-in for tab content */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Styling for elements within a tab panel (header metrics, stacked area chart, table) */
+.tab-content-panel .scenario-metrics-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around; /* Distribute metrics evenly */
+    gap: var(--spacing-unit);
     padding: calc(var(--spacing-unit) * 1.5);
-    border-top: 1px solid var(--color-border);
-    /* Initially hidden by JS */
+    background-color: var(--color-background-page); /* Light gray background for metrics header */
+    border-radius: var(--border-radius-base);
+    margin-bottom: calc(var(--spacing-unit) * 3); /* 24px */
 }
-.strategy-explanation {
+.tab-content-panel .metric-item {
+    text-align: center;
     font-size: 0.9rem;
     color: var(--color-text-secondary);
-    margin-bottom: calc(var(--spacing-unit) * 1.5);
-    font-style: italic;
 }
-.table-responsive {
-    overflow-x: auto; /* For small screens if table is wide */
+.tab-content-panel .metric-item strong {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
 }
-.month-by-month-table {
+.tab-content-panel .metric-item .interest-value { /* Specifically for interest in this header */
+    color: var(--color-accent-warning); /* Using the new darker, AA compliant orange for text */
+}
+
+.tab-content-panel .chart-container { /* For stacked area chart */
+    position: relative;
+    height: 300px; /* Default height */
+    width: 100%;
+    margin-bottom: calc(var(--spacing-unit) * 3); /* 24px */
+}
+
+.tab-content-panel .month-by-month-table { /* V3 table styling */
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.875rem;
+    font-size: 0.875rem; /* 14px */
+    margin-top: calc(var(--spacing-unit) * 2); /* 16px */
 }
-.month-by-month-table th, .month-by-month-table td {
+.tab-content-panel .month-by-month-table th,
+.tab-content-panel .month-by-month-table td {
     border: 1px solid var(--color-border);
-    padding: var(--spacing-unit);
+    padding: calc(var(--spacing-unit) * 1.25); /* 10px */
     text-align: left;
+    vertical-align: middle;
 }
-.month-by-month-table th {
-    background-color: var(--color-background);
+.tab-content-panel .month-by-month-table thead th {
+    background-color: var(--color-background-page); /* Light Gray */
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-secondary);
+    position: sticky; /* Sticky header for table if it scrolls */
+    top: 0;
+    z-index: 1;
 }
-/* End of Stage 3 styling */
+.tab-content-panel .table-responsive { /* Wrapper for table if needed */
+    max-height: 400px; /* Example max height for scrollable table */
+    overflow-y: auto;
+}
 
-
-/* --- Animations & Transitions --- */
-.stage {
+/* V3 Animations & Interactions Styling */
+.dynamic-item-card, .dynamic-scenario-item { /* Classes for dynamically added card/scenario items */
+    transition: opacity 0.4s ease-out, transform 0.4s ease-out, max-height 0.4s ease-out, padding 0.3s ease-out, margin 0.3s ease-out;
+    opacity: 1;
+    transform: scale(1);
+    max-height: 500px; /* Adjust as needed, large enough for content */
+    overflow: hidden; /* Important for max-height transition */
+}
+/* Initial state for adding new items (JS should add, then remove this class or add 'is-visible') */
+.is-adding {
     opacity: 0;
     transform: translateY(20px);
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    max-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    border-width: 0; /* Hide border during transition */
 }
-.stage.is-visible {
+.is-removing { /* Class added by JS before removing element */
+    opacity: 0;
+    transform: scale(0.95);
+    max-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    border-width: 0;
+}
+
+
+.results-section-wrapper { /* Existing results section */
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    opacity: 0;
+    transform: translateY(20px); /* Start off-screen */
+}
+.results-section-wrapper.is-visible {
     opacity: 1;
     transform: translateY(0);
 }
 
-/* Basic Spinner for loading button state */
-.spinner {
+.tab-content-panel { /* Existing tab content */
+    display: none;
+    opacity: 0;
+    transition: opacity 0.4s ease-out;
+}
+.tab-content-panel.is-active {
+    display: block;
+    opacity: 1;
+}
+
+
+/* V3 Tooltip Popup */
+.info-tooltip-popup-v3 {
+    position: absolute;
+    background-color: var(--color-secondary); /* Deep Navy */
+    color: var(--color-text-on-dark-bg); /* White */
+    padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5); /* 8px 12px */
+    border-radius: var(--border-radius-base); /* 8px */
+    font-size: 0.8125rem; /* 13px */
+    line-height: 1.5;
+    z-index: 1070; /* High z-index */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    max-width: 220px;
+    text-align: left;
+    opacity: 0; /* Hidden by default for transition */
+    transition: opacity 0.15s ease-in-out;
+    pointer-events: none; /* Prevent interaction with tooltip itself */
+}
+.info-tooltip-popup-v3.is-visible { /* JS will add this class */
+    opacity: 1;
+}
+
+/* V3 Spinner Icon for Calculate Button */
+.spinner-icon {
     display: inline-block;
-    width: 1em; /* Relative to button font size */
+    width: 1em;
     height: 1em;
-    margin-right: 0.5em;
-    border: 2px solid rgba(255,255,255,0.3);
+    margin-right: calc(var(--spacing-unit) * 0.75); /* 6px */
+    border: 2px solid rgba(255,255,255,0.4); /* Lighter border for on-button */
     border-radius: 50%;
-    border-top-color: var(--color-white);
-    animation: spin 1s ease-in-out infinite;
-    vertical-align: middle; /* Align with text */
-}
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* --- Tooltip Popup Styling --- */
-.info-tooltip-popup {
-    position: absolute; /* Positioned by JS */
-    background-color: var(--color-text-primary);
-    color: var(--color-container-bg);
-    padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
-    border-radius: var(--border-radius-sm);
-    font-size: 0.875rem; /* 14px */
-    line-height: 1.4;
-    z-index: 1000; /* Ensure it's on top */
-    box-shadow: var(--box-shadow-soft);
-    max-width: 250px;
-    display: none; /* Hidden by default, shown by JS */
-    pointer-events: none; /* Prevent tooltip from interfering with mouse events */
-}
-
-/* --- Accordion Styling (Basic for now, can be enhanced) --- */
-.accordion-item {
-    /* Existing styles are fine, add transition for content */
-}
-.accordion-content {
-    /* Existing styles */
-    display: none; /* Hidden by default */
-    overflow: hidden;
-    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
-    max-height: 0; /* For transition */
-    padding-top: 0;
-    padding-bottom: 0;
-}
-.accordion-item.is-active .accordion-content {
-    display: block; /* Shown by JS by adding is-active to accordion-item */
-    max-height: 2000px; /* Large enough value for content */
-    padding-top: calc(var(--spacing-unit) * 1.5);
-    padding-bottom: calc(var(--spacing-unit) * 1.5);
-}
-.accordion-header {
-    transition: background-color 0.2s ease;
-}
-.accordion-header:hover {
-    background-color: #e9ecef; /* Slightly darker than --color-background */
-}
-.accordion-header h4 { /* Ensure header text is aligned well */
-    line-height: 1.4;
-}
-
-.metric-interest-alert { /* Class for high interest values in summary cards */
-    color: var(--color-alert-negative) !important; /* Ensure it overrides other styles */
-    font-weight: var(--font-weight-semibold) !important;
-}
-
-.scenario-summary-card.is-recommended {
-    border-width: 2px; /* Make border thicker for recommended */
-    box-shadow: 0 0 0 3px var(--color-primary-action), var(--box-shadow-lifted); /* More prominent outer glow + existing shadow */
-}
-.scenario-badge.recommended-badge {
-    top: 0; /* Align with the very top of the card if border is thicker */
-    right: calc(var(--spacing-unit) * 1.5); /* Adjust if padding/border changes affect position */
-    border-radius: 0 0 var(--border-radius-sm) var(--border-radius-sm);
-}
-
-/* Ensure tooltip trigger is vertically aligned with text if next to an input */
-.form-group input[type="number"] + .tooltip-trigger {
-    vertical-align: middle; /* Try to align with the input's text baseline */
-    position: relative;
-    top: -2px; /* Fine-tune vertical alignment */
-}
-
-/* Polish for main CTA button text when spinner is active */
-#calculate-btn .spinner + span {
+    border-top-color: var(--color-text-on-primary); /* White */
+    animation: spinV3 0.8s linear infinite;
     vertical-align: middle;
 }
-#calculate-btn:disabled {
-    opacity: 0.8; /* Slightly dim disabled button */
+@keyframes spinV3 {
+    to { transform: rotate(360deg); }
+}
+.btn-calculate-cta:disabled {
+    opacity: 0.75; /* Make disabled button a bit more obvious */
 }
 
-/* Ensure stages take up space even when content is minimal for transition */
-.stage {
-    min-height: 100px; /* Or some other appropriate value */
+/* V3 Icon Styling */
+.btn-icon { /* For icons inside buttons, typically left */
+    margin-right: calc(var(--spacing-unit) * 0.75); /* 6px */
+    width: 1em; /* Match text size */
+    height: 1em;
+    vertical-align: text-bottom; /* Align better with text */
 }
-#stage-3-results.is-visible { /* Ensure results stage also has some min height if needed */
-    min-height: 300px;
+.btn-icon-right { /* For icons on the right of button text */
+    margin-left: calc(var(--spacing-unit) * 0.75);
+    width: 1em;
+    height: 1em;
+    vertical-align: text-bottom;
+}
+.btn-sm-v3 .btn-icon { /* Smaller icons for smaller remove buttons */
+    margin-right: 0; /* No margin if icon-only or very small button */
+    width: 0.9em;
+    height: 0.9em;
+}
+
+.tooltip-trigger-v3 .icon-info {
+    width: 1em; /* Match surrounding text size */
+    height: 1em;
+    color: var(--color-text-secondary); /* Explicit color */
+    vertical-align: middle;
+    transition: color 0.15s ease-in-out;
+}
+.tooltip-trigger-v3:hover .icon-info,
+.tooltip-trigger-v3:focus .icon-info {
+    color: var(--color-primary); /* Change icon color on hover/focus of trigger */
+}
+
+
+.btn-add-item .btn-icon { /* Ensure icon in "Add" buttons is correctly sized and aligned */
+    width: 1.1em; /* Slightly larger than text */
+    height: 1.1em;
+    position: relative;
+    top: -0.05em; /* Fine-tune vertical alignment */
+}
+
+
+.spinner-icon.lucide-spin { /* Lucide spinner animation */
+    /* animation: spinV3 1s linear infinite; */ /* Rely on Lucide's own spin if .lucide-spin is used */
+}
+/* Ensure Lucide icons are sized appropriately if not done by library defaults */
+i[data-lucide] {
+    width: 1em;
+    height: 1em;
+    display: inline-block; /* Helps with alignment */
+    vertical-align: middle;
+}
+.btn i[data-lucide] { /* Icons specifically in buttons */
+     /* margin-right handled by .btn-icon or .btn-icon-right */
+}
+.btn-sm-v3 i[data-lucide] { /* Icons in small remove buttons */
+    width: 14px; /* Fixed small size */
+    height: 14px;
+}
+
+/* Optimal strategy highlight icon */
+#optimal-strategy-highlight .icon-check-circle {
+    margin-right: var(--spacing-unit);
+    color: var(--color-text-on-primary); /* White on green bg */
+    width: 1.2em;
+    height: 1.2em;
+    vertical-align: middle;
+    position: relative;
+    top: -1px;
+}
+
+/* Adjust card header for icon button */
+.card-header-v3 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: calc(var(--spacing-unit) * 2); /* Same as .form-title-v3 had */
+}
+.card-header-v3 .form-title-v3 {
+    margin-bottom: 0; /* Remove bottom margin as it's on the header now */
+}
+.btn-sm-v3 { /* Style for small remove buttons */
+    padding: calc(var(--spacing-unit) * 0.75) calc(var(--spacing-unit) * 1); /* 6px 8px - slightly larger */
+    line-height: 1; /* Ensure icon fits well */
+    /* Ensure icon inside is not too large for this small button */
+}
+.btn-sm-v3 i[data-lucide] {
+    width: 12px; /* Explicit small size for these buttons */
+    height: 12px;
 }

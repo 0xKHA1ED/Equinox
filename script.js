@@ -1,522 +1,513 @@
-// Main JavaScript file for the Credit Card Debt Visualizer
+// V3 Design - Credit Card Debt Visualizer - script.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM fully loaded and parsed");
+    console.log("V3 DOM fully loaded and parsed");
 
-    // --- Chart.js Global Styling ---
+    // --- Chart.js Global Styling (V3) ---
     try {
-        Chart.defaults.font.family = "'Inter', 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
-        Chart.defaults.color = '#212529'; // --color-text-primary
-        Chart.defaults.borderColor = '#DEE2E6'; // --color-border
-        Chart.defaults.animation.duration = 800; // Default animation duration
-        Chart.defaults.animation.easing = 'easeOutQuart';
+        Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
+        Chart.defaults.color = '#343A40'; // var(--color-text-primary)
+        Chart.defaults.borderColor = '#DEE2E6'; // var(--color-border)
+        Chart.defaults.animation.duration = 600;
+        Chart.defaults.animation.easing = 'easeOutCubic';
+        Chart.defaults.plugins.tooltip.backgroundColor = '#1C3D5A';
+        Chart.defaults.plugins.tooltip.titleColor = '#FFFFFF';
+        Chart.defaults.plugins.tooltip.bodyColor = '#F8F9FA';
+        Chart.defaults.plugins.tooltip.padding = 8;
+        Chart.defaults.plugins.tooltip.cornerRadius = 4;
+        Chart.defaults.plugins.legend.labels.boxWidth = 12;
+        Chart.defaults.plugins.legend.labels.padding = 15;
     } catch (e) {
-        console.warn("Could not set Chart.js defaults.", e);
+        console.warn("Could not set Chart.js V3 defaults.", e);
     }
 
-    // --- Element References ---
+    // --- Element References (V3) ---
     const addCardBtn = document.getElementById('add-card-btn');
     const creditCardFormsContainer = document.getElementById('credit-card-forms-container');
-    let cardCount = 1;
 
     const addScenarioBtn = document.getElementById('add-scenario-btn');
     const scenarioFormsContainer = document.getElementById('scenario-forms-container');
-    let scenarioCount = 1;
 
-    const stage1WelcomeInput = document.getElementById('stage-1-welcome-input');
-    const stage2Scenarios = document.getElementById('stage-2-scenarios');
-    const stage3Results = document.getElementById('stage-3-results');
     const calculateBtn = document.getElementById('calculate-btn');
-    const firstCardBalanceInput = document.getElementById('current-balance-1');
+    const resultsSection = document.getElementById('results-section');
 
-    // --- Stage Management ---
-    function revealStage(stageElement, focusElementId = null) {
-        if (stageElement && stageElement.style.display === 'none') {
-            stageElement.style.display = 'block';
-            setTimeout(() => {
-                stageElement.classList.add('is-visible');
-                if (focusElementId) {
-                    const elToFocus = document.getElementById(focusElementId);
-                    if (elToFocus) elToFocus.focus();
-                }
-            }, 10); // Small delay to allow display:block to take effect before transition
-        }
-    }
-    if (stage1WelcomeInput) stage1WelcomeInput.classList.add('is-visible'); // Stage 1 is visible by default
+    window.detailedAreaCharts = {}; // To store instances of detailed charts for destruction
+    window.scenarioBarChart = null; // For the main comparison bar chart
 
-    // Reveal Stage 2
-    if (firstCardBalanceInput && stage2Scenarios) {
-        firstCardBalanceInput.addEventListener('blur', () => {
-            if (parseFloat(firstCardBalanceInput.value) > 0 && stage2Scenarios.style.display === 'none') {
-                revealStage(stage2Scenarios, 'total-monthly-payment-1'); // Focus first scenario input
+    addCardFormV3();
+    addScenarioFormV3();
+
+    // --- Event Listeners (V3) ---
+    if (addCardBtn) addCardBtn.addEventListener('click', addCardFormV3);
+    if (addScenarioBtn) addScenarioBtn.addEventListener('click', addScenarioFormV3);
+
+    document.addEventListener('click', function(event) {
+        if (event.target && event.target.closest('.btn-remove-item')) {
+            const itemToRemove = event.target.closest('.credit-card-item-card, .scenario-input-item');
+            if (itemToRemove) {
+                itemToRemove.classList.add('is-removing');
+                setTimeout(() => {
+                    itemToRemove.remove();
+                    if (itemToRemove.classList.contains('credit-card-item-card')) updateCardTitlesV3();
+                    else if (itemToRemove.classList.contains('scenario-input-item')) updateScenarioTitlesV3();
+                }, 300);
             }
-        });
-    }
-
-    // --- Event Listeners ---
-    if (addCardBtn) {
-        addCardBtn.addEventListener('click', () => {
-            cardCount++;
-            const newCardFormHTML = `
-                <div class="card-input-form-container container-card">
-                    <h2 class="form-title">Card ${cardCount}</h2>
-                    <div class="form-group">
-                        <label for="card-nickname-${cardCount}">Card Nickname</label>
-                        <input type="text" id="card-nickname-${cardCount}" name="card-nickname" placeholder="e.g., Store Card">
-                    </div>
-                    <div class="form-group">
-                        <label for="current-balance-${cardCount}">Current Balance ($)</label>
-                        <input type="number" id="current-balance-${cardCount}" name="current-balance" placeholder="e.g., 1000" step="0.01" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="interest-rate-${cardCount}">Monthly Interest Rate (%)</label>
-                        <input type="number" id="interest-rate-${cardCount}" name="interest-rate" placeholder="e.g., 2.0" step="0.01" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="min-payment-percentage-${cardCount}">Minimum Monthly Payment (% of Balance)</label>
-                        <input type="number" id="min-payment-percentage-${cardCount}" name="min-payment-percentage" placeholder="e.g., 3" step="0.01" min="0">
-                        <span class="tooltip-trigger" tabindex="0" aria-label="Information about minimum payment percentage" data-tooltip-text="Find this percentage on your monthly statement. It's usually 1-3% of your balance.">?</span>
-                    </div>
-                </div>`;
-            creditCardFormsContainer.insertAdjacentHTML('beforeend', newCardFormHTML);
-        });
-    }
-
-    if (addScenarioBtn) {
-        addScenarioBtn.addEventListener('click', () => {
-            scenarioCount++;
-            const newScenarioFormHTML = `
-                <div class="scenario-input-form">
-                    <h3 class="form-title">Scenario ${scenarioCount}</h3>
-                    <div class="form-group">
-                        <label for="total-monthly-payment-${scenarioCount}">Total Monthly Payment ($)</label>
-                        <input type="number" id="total-monthly-payment-${scenarioCount}" name="total-monthly-payment" placeholder="e.g., 700" step="0.01" min="0">
-                    </div>
-                </div>`;
-            scenarioFormsContainer.insertAdjacentHTML('beforeend', newScenarioFormHTML);
-            document.getElementById(`total-monthly-payment-${scenarioCount}`).focus();
-        });
-    }
+        }
+    });
 
     if (calculateBtn) {
+        const originalCalculateBtnHTML = calculateBtn.innerHTML; // Store original content
+
         calculateBtn.addEventListener('click', () => {
             calculateBtn.disabled = true;
-            calculateBtn.innerHTML = '<span class="spinner"></span> Calculating...';
-            const keyInsightCalloutEl = document.getElementById('key-insight-callout');
-            if (keyInsightCalloutEl) keyInsightCalloutEl.innerHTML = '<p>Calculating your best options...</p>';
+            // Use Lucide spinner icon directly if available, or fallback to CSS spinner
+            calculateBtn.innerHTML = '<i data-lucide="loader-2" class="spinner-icon lucide-spin"></i> Calculating...';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
 
-            // Clear previous results
-            document.getElementById('scenario-comparison-cards-container').innerHTML = '';
-            document.getElementById('detailed-breakdown-accordion-container').innerHTML = '';
-            if (window.myComparisonChart) window.myComparisonChart.destroy();
-            if (window.detailedChartInstances) {
-                Object.values(window.detailedChartInstances).forEach(chart => chart.destroy());
-                window.detailedChartInstances = {};
+
+            const optimalHighlightEl = document.getElementById('optimal-strategy-highlight');
+            if (optimalHighlightEl) optimalHighlightEl.innerHTML = '<p>Crunching the numbers...</p>';
+            document.getElementById('savings-insight-text').innerHTML = '';
+
+            const barChartCanvas = document.getElementById('scenarioComparisonBarChart');
+            if (barChartCanvas && window.scenarioBarChart) {
+                 window.scenarioBarChart.destroy();
+                 window.scenarioBarChart = null;
+            }
+            document.getElementById('detailed-scenario-breakdown').querySelector('.tab-list-container').innerHTML = '';
+            document.getElementById('detailed-scenario-breakdown').querySelector('.tab-content-container').innerHTML = '';
+            if (window.detailedAreaCharts) {
+                Object.values(window.detailedAreaCharts).forEach(chart => chart.destroy());
+                window.detailedAreaCharts = {};
             }
 
-            setTimeout(() => { // Simulate delay
-                const collectionSuccess = collectAndProcessData();
+            setTimeout(() => {
+                const collectionSuccess = collectAndProcessDataV3();
                 calculateBtn.disabled = false;
-                calculateBtn.innerHTML = 'Calculate Repayment Options';
+                calculateBtn.innerHTML = originalCalculateBtnHTML; // Restore original content
+                if (typeof lucide !== 'undefined') lucide.createIcons(); // Re-render icons if any in original HTML
+
                 if (collectionSuccess) {
-                    revealStage(stage3Results);
-                    stage3Results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    resultsSection.style.display = 'block';
+                    setTimeout(() => resultsSection.classList.add('is-visible'), 10);
+                    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 } else {
-                    if (keyInsightCalloutEl) keyInsightCalloutEl.innerHTML = '<p style="color: var(--color-alert-negative);">Please correct the errors in your inputs and try again.</p>';
+                    if (optimalHighlightEl) optimalHighlightEl.innerHTML = '<p style="color: var(--color-alert-negative);">Please correct errors in your inputs and try again.</p>';
+                    resultsSection.style.display = 'none';
+                    resultsSection.classList.remove('is-visible');
                 }
             }, 500);
         });
     }
 
-    // Tooltip Functionality
-    let currentTooltip = null;
-    function showTooltip(triggerElement) {
-        const tooltipText = triggerElement.dataset.tooltipText;
-        if (!tooltipText) return;
-
-        hideTooltip(); // Hide any existing tooltip
-
-        currentTooltip = document.createElement('div');
-        currentTooltip.className = 'info-tooltip-popup';
-        currentTooltip.textContent = tooltipText;
-        document.body.appendChild(currentTooltip);
-
-        const rect = triggerElement.getBoundingClientRect();
-        let top = rect.top + window.scrollY - currentTooltip.offsetHeight - 8; // 8px offset
-        let left = rect.left + window.scrollX + (rect.width / 2) - (currentTooltip.offsetWidth / 2);
-
-        // Adjust if out of viewport (simple adjustment)
-        if (top < window.scrollY + 8) top = rect.bottom + window.scrollY + 8;
-        if (left < window.scrollX + 8) left = window.scrollX + 8;
-        if (left + currentTooltip.offsetWidth > window.scrollX + document.documentElement.clientWidth - 8) {
-            left = window.scrollX + document.documentElement.clientWidth - 8 - currentTooltip.offsetWidth;
-        }
-
-        currentTooltip.style.top = `${top}px`;
-        currentTooltip.style.left = `${left}px`;
-        currentTooltip.style.display = 'block'; // Make visible
-        setTimeout(() => currentTooltip.classList.add('is-visible'), 10); // For fade-in
-    }
-    function hideTooltip() {
-        if (currentTooltip) {
-            currentTooltip.remove();
-            currentTooltip = null;
-        }
-    }
-    document.body.addEventListener('mouseover', e => e.target.classList.contains('tooltip-trigger') && showTooltip(e.target));
-    document.body.addEventListener('mouseout', e => e.target.classList.contains('tooltip-trigger') && hideTooltip());
-    document.body.addEventListener('focusin', e => e.target.classList.contains('tooltip-trigger') && showTooltip(e.target));
-    document.body.addEventListener('focusout', e => e.target.classList.contains('tooltip-trigger') && hideTooltip());
-    document.querySelectorAll('.tooltip-trigger').forEach(el => el.setAttribute('tabindex', '0'));
-
+    setupTooltipsV3();
 }); // End DOMContentLoaded
 
 
-function collectAndProcessData() {
-    const cardData = [];
-    const cardEntries = document.querySelectorAll('#credit-card-forms-container .card-input-form-container');
-    let allCardsValid = true;
-    cardEntries.forEach((entry, index) => {
-        if (!allCardsValid) return;
-        const nicknameInput = entry.querySelector('input[name="card-nickname"]');
-        const balanceInput = entry.querySelector('input[name="current-balance"]');
-        const interestRateInput = entry.querySelector('input[name="interest-rate"]');
-        const minPaymentPercentageInput = entry.querySelector('input[name="min-payment-percentage"]');
+function addCardFormV3() {
+    const container = document.getElementById('credit-card-forms-container');
+    const cardIndex = container.querySelectorAll('.credit-card-item-card').length + 1;
+    const newCardId = `card-item-dynamic-${Date.now()}`; // Unique ID for element
 
+    const cardHTML = `
+        <div class="credit-card-item-card dynamic-item-card is-adding" id="${newCardId}" data-card-id="${cardIndex}">
+            <div class="card-header-v3">
+                <h3 class="form-title-v3">Credit Card ${cardIndex}</h3>
+                ${cardIndex > 1 ? `<button type="button" class="btn btn-destructive btn-remove-item btn-sm-v3" aria-label="Remove Card ${cardIndex}"><i data-lucide="trash-2" class="btn-icon"></i></button>` : ''}
+            </div>
+            <div class="form-group">
+                <label for="card-nickname-${cardIndex}">Card Nickname</label>
+                <input type="text" id="card-nickname-${cardIndex}" name="card-nickname" placeholder="e.g., Visa Rewards">
+            </div>
+            <div class="form-group">
+                <label for="current-balance-${cardIndex}">Current Balance ($)</label>
+                <input type="number" id="current-balance-${cardIndex}" name="current-balance" placeholder="e.g., 5000" step="0.01" min="0">
+            </div>
+            <div class="form-group">
+                <label for="interest-rate-${cardIndex}">Monthly Interest Rate (%)</label>
+                <input type="number" id="interest-rate-${cardIndex}" name="interest-rate" placeholder="e.g., 1.5" step="0.01" min="0">
+                <span class="tooltip-trigger-v3" tabindex="0" data-tooltip-text="Your APR divided by 12. E.g., 18% APR is 1.5% monthly."><i data-lucide="info" class="icon-info"></i></span>
+            </div>
+            <div class="form-group">
+                <label for="min-payment-percentage-${cardIndex}">Minimum Payment (%)</label>
+                <input type="number" id="min-payment-percentage-${cardIndex}" name="min-payment-percentage" placeholder="e.g., 2" step="0.01" min="0">
+                <span class="tooltip-trigger-v3" tabindex="0" data-tooltip-text="Found on your statement, usually 1-3% of balance or a flat fee."><i data-lucide="info" class="icon-info"></i></span>
+            </div>
+        </div>`;
+    container.insertAdjacentHTML('beforeend', cardHTML);
+    const newElement = document.getElementById(newCardId);
+    if (typeof lucide !== 'undefined') lucide.createIcons({ context: newElement }); // Render icons within the new element
+    setTimeout(() => {
+        newElement.classList.remove('is-adding');
+        document.getElementById(`card-nickname-${cardIndex}`).focus();
+    }, 10);
+}
+
+function updateCardTitlesV3() {
+    const cards = document.querySelectorAll('#credit-card-forms-container .credit-card-item-card');
+    cards.forEach((card, index) => {
+        const cardNumericId = index + 1;
+        card.dataset.cardId = cardNumericId;
+        const titleEl = card.querySelector('.form-title-v3');
+        const removeBtn = card.querySelector('.btn-remove-item');
+        if (titleEl) titleEl.textContent = `Credit Card ${cardNumericId}`;
+        if (removeBtn) removeBtn.setAttribute('aria-label', `Remove Card ${cardNumericId}`);
+        else if (cardNumericId > 1 && !removeBtn) {
+            const header = card.querySelector('.card-header-v3');
+            if(header) header.insertAdjacentHTML('beforeend', `<button type="button" class="btn btn-destructive btn-remove-item btn-sm-v3" aria-label="Remove Card ${cardNumericId}"><span class="icon-trash-2">&times;</span></button>`);
+        } else if (cardNumericId === 1 && removeBtn) {
+            removeBtn.remove();
+        }
+        card.querySelectorAll('label').forEach(label => { const oldFor = label.htmlFor; if (oldFor) label.htmlFor = oldFor.replace(/-(\d+)$/, `-${cardNumericId}`); });
+        card.querySelectorAll('input').forEach(input => { const oldId = input.id; if (oldId) input.id = oldId.replace(/-(\d+)$/, `-${cardNumericId}`); });
+    });
+}
+
+function addScenarioFormV3() {
+    const container = document.getElementById('scenario-forms-container');
+    const scenarioIndex = container.querySelectorAll('.scenario-input-item').length + 1;
+    const newScenarioId = `scenario-item-dynamic-${Date.now()}`;
+    const scenarioHTML = `
+        <div class="scenario-input-item dynamic-scenario-item is-adding" id="${newScenarioId}" data-scenario-id="${scenarioIndex}">
+            <div class="card-header-v3">
+                 <h3 class="form-title-v3">Scenario ${scenarioIndex}</h3>
+                ${scenarioIndex > 1 ? `<button type="button" class="btn btn-destructive btn-remove-item btn-sm-v3" aria-label="Remove Scenario ${scenarioIndex}"><i data-lucide="trash-2" class="btn-icon"></i></button>` : ''}
+            </div>
+            <div class="form-group">
+                <label for="total-monthly-payment-${scenarioIndex}">Total Monthly Payment ($)</label>
+                <input type="number" id="total-monthly-payment-${scenarioIndex}" name="total-monthly-payment" placeholder="e.g., 500" step="0.01" min="0">
+            </div>
+        </div>`;
+    container.insertAdjacentHTML('beforeend', scenarioHTML);
+    const newElement = document.getElementById(newScenarioId);
+    if (typeof lucide !== 'undefined') lucide.createIcons({ context: newElement });
+    setTimeout(() => {
+        newElement.classList.remove('is-adding');
+        document.getElementById(`total-monthly-payment-${scenarioIndex}`).focus();
+    }, 10);
+}
+
+function updateScenarioTitlesV3() {
+    const scenarios = document.querySelectorAll('#scenario-forms-container .scenario-input-item');
+    scenarios.forEach((scenario, index) => {
+        const scenarioNumericId = index + 1;
+        scenario.dataset.scenarioId = scenarioNumericId;
+        const titleEl = scenario.querySelector('.form-title-v3');
+        const removeBtn = scenario.querySelector('.btn-remove-item');
+        if (titleEl) titleEl.textContent = `Scenario ${scenarioNumericId}`;
+        if (removeBtn) removeBtn.setAttribute('aria-label', `Remove Scenario ${scenarioNumericId}`);
+        else if (scenarioNumericId > 1 && !removeBtn) {
+            const header = scenario.querySelector('.card-header-v3');
+            if(header) header.insertAdjacentHTML('beforeend', `<button type="button" class="btn btn-destructive btn-remove-item btn-sm-v3" aria-label="Remove Scenario ${scenarioNumericId}"><span class="icon-trash-2">&times;</span></button>`);
+        } else if (scenarioNumericId === 1 && removeBtn) {
+            removeBtn.remove();
+        }
+        scenario.querySelectorAll('label').forEach(label => { const oldFor = label.htmlFor; if (oldFor) label.htmlFor = oldFor.replace(/-(\d+)$/, `-${scenarioNumericId}`); });
+        scenario.querySelectorAll('input').forEach(input => { const oldId = input.id; if (oldId) input.id = oldId.replace(/-(\d+)$/, `-${scenarioNumericId}`); });
+    });
+}
+
+function collectAndProcessDataV3() {
+    const cardData = [];
+    const cardEntries = document.querySelectorAll('#credit-card-forms-container .credit-card-item-card');
+    let allCardsValid = true;
+    cardEntries.forEach((entry) => {
+        const cardNumericId = parseInt(entry.dataset.cardId);
+        const nicknameInput = entry.querySelector(`input[id^="card-nickname-"]`);
+        const balanceInput = entry.querySelector(`input[id^="current-balance-"]`);
+        const interestRateInput = entry.querySelector(`input[id^="interest-rate-"]`);
+        const minPaymentPercentageInput = entry.querySelector(`input[id^="min-payment-percentage-"]`);
+        [nicknameInput, balanceInput, interestRateInput, minPaymentPercentageInput].forEach(inp => inp && inp.classList.remove('is-invalid'));
         const nickname = nicknameInput.value.trim();
         const balance = parseFloat(balanceInput.value);
         const interestRate = parseFloat(interestRateInput.value);
         const minPaymentPercentage = parseFloat(minPaymentPercentageInput.value);
-
-        if (!nickname) { alert(`Error in Card ${index + 1}: Nickname cannot be empty.`); allCardsValid = false; }
-        if (isNaN(balance) || balance < 0) { alert(`Error in Card ${index + 1} ('${nickname || 'N/A'}'): Balance must be non-negative.`); allCardsValid = false; }
-        if (isNaN(interestRate) || interestRate < 0 || interestRate > 100) { alert(`Error in Card ${index + 1} ('${nickname || 'N/A'}'): Interest Rate must be 0-100.`); allCardsValid = false; }
-        if (isNaN(minPaymentPercentage) || minPaymentPercentage < 0 || minPaymentPercentage > 100) { alert(`Error in Card ${index + 1} ('${nickname || 'N/A'}'): Min. Payment % must be 0-100.`); allCardsValid = false; }
-
-        if (allCardsValid) {
-            cardData.push({ id: index + 1, nickname, balance, interestRate: interestRate / 100, minPaymentPercentage: minPaymentPercentage / 100 });
-        }
+        if (!nickname) { alert(`Error in Card ${cardNumericId}: Nickname is required.`); nicknameInput && nicknameInput.classList.add('is-invalid'); allCardsValid = false; }
+        if (isNaN(balance) || balance < 0) { alert(`Error in Card ${cardNumericId} ('${nickname || 'N/A'}'): Balance must be a non-negative number.`); balanceInput && balanceInput.classList.add('is-invalid'); allCardsValid = false; }
+        if (isNaN(interestRate) || interestRate < 0 || interestRate > 100) { alert(`Error in Card ${cardNumericId} ('${nickname || 'N/A'}'): Monthly Interest Rate must be between 0 and 100.`); interestRateInput && interestRateInput.classList.add('is-invalid'); allCardsValid = false; }
+        if (isNaN(minPaymentPercentage) || minPaymentPercentage < 0 || minPaymentPercentage > 100) { alert(`Error in Card ${cardNumericId} ('${nickname || 'N/A'}'): Minimum Payment % must be between 0 and 100.`); minPaymentPercentageInput && minPaymentPercentageInput.classList.add('is-invalid'); allCardsValid = false; }
+        if (allCardsValid) cardData.push({ id: cardNumericId, nickname, balance, interestRate: interestRate / 100, minPaymentPercentage: minPaymentPercentage / 100 });
     });
     if (!allCardsValid) return false;
 
-    let combinedMinPayment = 0;
-    cardData.forEach(card => {
-        if (card.balance > 0) {
-            let minPayForCard = card.balance * card.minPaymentPercentage;
-            minPayForCard = Math.max(10, minPayForCard);
-            minPayForCard = Math.min(minPayForCard, card.balance + calculateMonthlyInterest(card.balance, card.interestRate));
-            combinedMinPayment += minPayForCard;
-        }
-    });
-    document.getElementById('combined-min-payment-display').textContent = `$${combinedMinPayment.toFixed(2)}`;
-    const firstScenarioInput = document.getElementById('total-monthly-payment-1');
-    if (firstScenarioInput.value.trim() === '' && combinedMinPayment > 0) {
-        firstScenarioInput.value = combinedMinPayment.toFixed(2);
-    }
-
     const scenarioData = [];
-    const scenarioEntries = document.querySelectorAll('#scenario-forms-container .scenario-input-form');
+    const scenarioEntries = document.querySelectorAll('#scenario-forms-container .scenario-input-item');
     let allScenariosValid = true;
-    scenarioEntries.forEach((entry, index) => {
-        if (!allScenariosValid) return;
-        const totalPaymentInput = entry.querySelector('input[name="total-monthly-payment"]');
+    scenarioEntries.forEach((entry) => {
+        const scenarioNumericId = parseInt(entry.dataset.scenarioId);
+        const totalPaymentInput = entry.querySelector(`input[id^="total-monthly-payment-"]`);
+        totalPaymentInput.classList.remove('is-invalid');
         const totalPayment = parseFloat(totalPaymentInput.value);
         if (isNaN(totalPayment) || totalPayment <= 0) {
-            alert(`Error in Scenario ${index + 1}: Total Monthly Payment must be > 0.`); allScenariosValid = false;
+            alert(`Error in Scenario ${scenarioNumericId}: Total Monthly Payment must be a positive number.`);
+            totalPaymentInput.classList.add('is-invalid'); allScenariosValid = false;
         } else {
-            scenarioData.push({ id: `scenario-${index + 1}`, totalMonthlyPayment: totalPayment, title: entry.querySelector('.form-title').textContent });
+            scenarioData.push({ id: `v3-scenario-${scenarioNumericId}`, title: entry.querySelector('.form-title-v3').textContent, totalMonthlyPayment: totalPayment });
         }
     });
     if (!allScenariosValid) return false;
-
     if (cardData.length === 0) { alert("Please add at least one credit card."); return false; }
-    if (scenarioData.length === 0) { alert("Please add at least one repayment scenario."); return false; }
+    if (scenarioData.length === 0) { alert("Please add at least one payment scenario."); return false; }
 
     const allScenarioResults = calculateAllScenarios(cardData, scenarioData);
-    populateKeyInsightCallout(allScenarioResults, cardData);
-    populateScenarioComparisonCards(allScenarioResults, cardData);
-    renderComparisonBarChart(allScenarioResults);
+    populateResultsSummaryCard_V3(allScenarioResults, cardData);
+    populateDetailedTabs_V3(allScenarioResults, cardData);
     return true;
 }
 
-function populateKeyInsightCallout(allScenarioResults, initialCardsData) {
-    const calloutEl = document.getElementById('key-insight-callout');
-    if (!calloutEl || !allScenarioResults || allScenarioResults.length === 0) {
-        if (calloutEl) calloutEl.innerHTML = '<p>Enter your card and scenario details to see insights here.</p>';
-        return;
-    }
-    let optimalByInterest = allScenarioResults.reduce((prev, current) => (prev.totalInterestPaid < current.totalInterestPaid) ? prev : current);
+function populateResultsSummaryCard_V3(allScenarioResults, initialCardsData) {
+    const optimalHighlightEl = document.getElementById('optimal-strategy-highlight');
+    const savingsInsightEl = document.getElementById('savings-insight-text');
+    if (!optimalHighlightEl || !savingsInsightEl || !allScenarioResults || allScenarioResults.length === 0) return;
+
+    const optimalScenario = allScenarioResults.reduce((prev, current) => (prev.totalInterestPaid < current.totalInterestPaid) ? prev : current);
+    optimalHighlightEl.innerHTML = `<p><span class="icon-check-circle"></span> Best Choice: Paying <strong>$${optimalScenario.totalMonthlyPayment.toFixed(2)}/month</strong> is your most cost-effective plan.</p>`;
+
     let savingsText = "";
     if (allScenarioResults.length > 1) {
-        let worstRelevantScenario = null;
-        let highestInterest = -Infinity; // Corrected initialization
-        allScenarioResults.forEach(s => {
-            if (s.scenarioId !== optimalByInterest.scenarioId) {
-                if (s.totalInterestPaid > highestInterest) {
-                    highestInterest = s.totalInterestPaid;
-                    worstRelevantScenario = s;
-                }
-            }
-        });
-        if (worstRelevantScenario && worstRelevantScenario.totalInterestPaid > optimalByInterest.totalInterestPaid) {
-            const interestSaved = worstRelevantScenario.totalInterestPaid - optimalByInterest.totalInterestPaid;
-            const timeSoonerMonths = worstRelevantScenario.monthsToPayOff - optimalByInterest.monthsToPayOff;
-            let timeSoonerText = "";
+        const highestInterestScenario = allScenarioResults.filter(s => s.scenarioId !== optimalScenario.scenarioId)
+                                       .reduce((prev, current) => (prev.totalInterestPaid > current.totalInterestPaid) ? prev : current, {totalInterestPaid: -1, monthsToPayOff: Infinity});
+        if (highestInterestScenario.totalInterestPaid > optimalScenario.totalInterestPaid) {
+            const interestSaved = highestInterestScenario.totalInterestPaid - optimalScenario.totalInterestPaid;
+            const timeSoonerMonths = highestInterestScenario.monthsToPayOff - optimalScenario.monthsToPayOff;
+            let timeText = "";
             if (timeSoonerMonths > 0) {
-                const yearsSooner = Math.floor(timeSoonerMonths / 12);
-                const monthsPart = timeSoonerMonths % 12;
-                if (yearsSooner > 0) timeSoonerText += `<strong>${yearsSooner}</strong> year${yearsSooner > 1 ? 's' : ''}`;
-                if (monthsPart > 0) { if (yearsSooner > 0) timeSoonerText += " and "; timeSoonerText += `<strong>${monthsPart}</strong> month${monthsPart > 1 ? 's' : ''}`; }
+                const years = Math.floor(timeSoonerMonths / 12); const months = timeSoonerMonths % 12;
+                if (years > 0) timeText += `<strong>${years}</strong> year${years > 1 ? 's' : ''}`;
+                if (months > 0) { if (years > 0) timeText += " and "; timeText += `<strong>${months}</strong> month${months > 1 ? 's' : ''}`; }
             }
-            if (timeSoonerText !== "") savingsText = `be debt-free ${timeSoonerText} sooner and save <strong>$${interestSaved.toFixed(2)}</strong> in interest!`;
-            else if (interestSaved > 0) savingsText = `save <strong>$${interestSaved.toFixed(2)}</strong> in interest!`;
-        }
+            savingsText = `By choosing this plan, you'll save <strong>$${interestSaved.toFixed(2)}</strong> in interest`;
+            if (timeText) savingsText += ` and be debt-free ${timeText} sooner`;
+            savingsText += ` compared to the plan paying $${highestInterestScenario.totalMonthlyPayment.toFixed(2)}/month.`;
+        } else { savingsText = "This is the most efficient plan you've entered."; }
+    } else {
+        savingsText = `This plan gets you debt-free in ${optimalScenario.monthsToPayOff} months, with $${optimalScenario.totalInterestPaid.toFixed(2)} in total interest.`;
     }
-    if (!savingsText) {
-        const years = Math.floor(optimalByInterest.monthsToPayOff / 12);
-        const months = optimalByInterest.monthsToPayOff % 12;
-        let timeToPayOffText = "";
-        if (years > 0) timeToPayOffText += `<strong>${years}</strong> year${years > 1 ? 's' : ''} `;
-        if (months > 0 || years === 0) { if (years > 0) timeToPayOffText += "and "; timeToPayOffText += `<strong>${months}</strong> month${months > 1 ? 's' : ''}`; }
-        if (timeToPayOffText === "") timeToPayOffText = "<strong>less than a month</strong>";
-        savingsText = `pay a total of <strong>$${optimalByInterest.totalInterestPaid.toFixed(2)}</strong> in interest and be debt-free in ${timeToPayOffText}.`;
-    }
-    calloutEl.innerHTML = `<p>With the recommended plan (paying <strong>$${optimalByInterest.totalMonthlyPayment.toFixed(2)}/month</strong>), you could ${savingsText}</p>`;
+    savingsInsightEl.innerHTML = `<p>${savingsText}</p>`;
+    renderScenarioBarChart_V3(allScenarioResults, optimalScenario.scenarioId);
 }
 
-function populateScenarioComparisonCards(allScenarioResults, initialCardsData) {
-    const container = document.getElementById('scenario-comparison-cards-container');
-    if (!container || !allScenarioResults || allScenarioResults.length === 0) return;
-    container.innerHTML = '';
-    let optimalByInterest = allScenarioResults.reduce((prev, current) => (prev.totalInterestPaid < current.totalInterestPaid) ? prev : current);
-    let highestInterestScenario = allScenarioResults.reduce((prev, current) => (prev.totalInterestPaid > current.totalInterestPaid) ? prev : current);
+function renderScenarioBarChart_V3(allScenarioResults, optimalScenarioId) {
+    const ctx = document.getElementById('scenarioComparisonBarChart')?.getContext('2d');
+    if (!ctx) return;
+    if (window.scenarioBarChart) window.scenarioBarChart.destroy();
 
-    allScenarioResults.forEach(scenario => {
-        const years = Math.floor(scenario.monthsToPayOff / 12);
-        const months = scenario.monthsToPayOff % 12;
-        let timeToPayOffText = "";
-        if (years > 0) timeToPayOffText += `${years} year${years > 1 ? 's' : ''}`;
-        if (months > 0 || years === 0) { if (years > 0) timeToPayOffText += ", "; timeToPayOffText += `${months} month${months > 1 ? 's' : ''}`; }
-        if (timeToPayOffText === "" && scenario.monthsToPayOff === 0 && scenario.totalPrincipalPaid > 0) timeToPayOffText = "Paid off instantly";
-        else if (timeToPayOffText === "") timeToPayOffText = "N/A";
+    const labels = allScenarioResults.map(s => s.title);
+    const interestData = allScenarioResults.map(s => s.totalInterestPaid);
+    const timeData = allScenarioResults.map(s => s.monthsToPayOff);
+    const optimalIndex = allScenarioResults.findIndex(s => s.scenarioId === optimalScenarioId);
 
-        const cardClasses = ['scenario-summary-card', 'container-card'];
-        if (scenario.scenarioId === optimalByInterest.scenarioId) cardClasses.push('is-recommended');
+    const interestColors = allScenarioResults.map((s, i) => i === optimalIndex ? 'rgba(40, 167, 69, 0.7)' : 'rgba(253, 126, 20, 0.7)'); // Green for optimal interest, Orange otherwise
+    const timeColors = allScenarioResults.map((s, i) => i === optimalIndex ? 'rgba(0, 90, 179, 0.9)' : 'rgba(0, 123, 255, 0.7)');     // Darker Blue for optimal time, Primary Blue otherwise
 
-        let interestClass = "metric-value";
-        if (scenario.scenarioId === highestInterestScenario.scenarioId && scenario.scenarioId !== optimalByInterest.scenarioId) {
-             interestClass = "metric-value metric-interest-alert";
-        }
 
-        const cardHTML = `
-            <div class="${cardClasses.join(' ')}">
-                ${scenario.scenarioId === optimalByInterest.scenarioId ? '<div class="scenario-badge recommended-badge">Recommended</div>' : ''}
-                <h3 class="scenario-title">${scenario.title || `Scenario: $${scenario.totalMonthlyPayment.toFixed(2)}/month`}</h3>
-                <p class="metric"><strong>Time to Debt-Free:</strong> <span class="metric-value">${timeToPayOffText}</span></p>
-                <p class="metric"><strong>Total Interest Paid:</strong> <span class="${interestClass}">$${scenario.totalInterestPaid.toFixed(2)}</span></p>
-                <p class="metric"><strong>Total Principal Paid:</strong> <span class="metric-value">$${scenario.totalPrincipalPaid.toFixed(2)}</span></p>
-                <a href="#" class="details-link" data-scenario-id="${scenario.scenarioId}">See Detailed Breakdown &raquo;</a>
-            </div>`;
-        container.insertAdjacentHTML('beforeend', cardHTML);
-    });
-
-    document.querySelectorAll('.details-link').forEach(link => {
-        link.addEventListener('click', event => {
-            event.preventDefault();
-            const scenarioId = event.target.dataset.scenarioId;
-            const scenarioResult = allScenarioResults.find(r => r.scenarioId === scenarioId);
-            const accordionContainer = document.getElementById('detailed-breakdown-accordion-container');
-            const targetAccordionItemId = `accordion-item-${scenarioId}`;
-            let targetAccordionItem = document.getElementById(targetAccordionItemId);
-            const currentlyActiveItem = accordionContainer.querySelector('.accordion-item.is-active');
-
-            if (currentlyActiveItem && currentlyActiveItem.id !== targetAccordionItemId) {
-                currentlyActiveItem.classList.remove('is-active');
-            }
-            if (!targetAccordionItem && scenarioResult) {
-                renderDetailedBreakdown(scenarioResult, initialCardsData, accordionContainer, targetAccordionItemId);
-                targetAccordionItem = document.getElementById(targetAccordionItemId);
-            }
-            if (targetAccordionItem) {
-                targetAccordionItem.classList.toggle('is-active');
-                 if (targetAccordionItem.classList.contains('is-active')) {
-                    setTimeout(() => targetAccordionItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 10);
-                }
-            }
-        });
-    });
-}
-
-function renderComparisonBarChart(allScenarioResults) {
-    const comparisonChartCtx = document.getElementById('comparisonChart')?.getContext('2d');
-    if (!comparisonChartCtx || !allScenarioResults || allScenarioResults.length === 0) return;
-    const labels = allScenarioResults.map(res => res.title || `$${res.totalMonthlyPayment.toFixed(2)}/month`);
-    const totalInterestData = allScenarioResults.map(res => res.totalInterestPaid);
-    if (window.myComparisonChart) window.myComparisonChart.destroy();
-    window.myComparisonChart = new Chart(comparisonChartCtx, {
+    window.scenarioBarChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
             datasets: [{
-                label: 'Total Interest Paid ($)',
-                data: totalInterestData,
-                backgroundColor: 'rgba(0, 123, 255, 0.6)', // Using primary action color with opacity
-                borderColor: 'rgba(0, 123, 255, 1)',
-                borderWidth: 1,
+                label: 'Total Interest Paid', data: interestData,
+                backgroundColor: interestColors,
+                borderColor: interestColors.map(c => c.replace('0.7', '1').replace('0.9','1')),
+                borderWidth: 1, yAxisID: 'yInterest', order: 1
+            }, {
+                label: 'Time to Debt-Free (Months)', data: timeData,
+                backgroundColor: timeColors,
+                borderColor: timeColors.map(c => c.replace('0.7', '1').replace('0.9','1')),
+                borderWidth: 1, yAxisID: 'yTime', order: 2
             }]
         },
         options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.dataset.label || ''}: $${ctx.parsed.y.toFixed(2)}` }}},
-            scales: { y: { beginAtZero: true, title: { display: true, text: 'Total Interest Paid ($)' }}, x: { title: { display: false }}}
+            responsive: true, maintainAspectRatio: false, indexAxis: 'x',
+            plugins: { tooltip: { mode: 'index', intersect: false }, legend: { position: 'bottom' } },
+            scales: {
+                yInterest: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Total Interest Paid ($)', color: 'var(--color-accent-warning)' }, ticks:{color: 'var(--color-accent-warning)'} },
+                yTime: { type: 'linear', display: true, position: 'right', title: { display: true, text: 'Months to Debt-Free', color: 'var(--color-primary)' }, grid: { drawOnChartArea: false }, ticks:{color: 'var(--color-primary)'} }
+            }
         }
     });
 }
 
-function renderDetailedBreakdown(scenarioResult, initialCardsData, accordionContainer, accordionItemId) {
-    if (!accordionContainer) return;
-    const monthByMonthRows = scenarioResult.monthlyBreakdown.map(month => `
-        <tr><td>${month.month}</td><td>$${month.totalPaymentThisMonth.toFixed(2)}</td><td>$${month.totalInterestThisMonth.toFixed(2)}</td><td>$${month.totalPrincipalPaidThisMonth.toFixed(2)}</td><td>$${Math.max(0, month.cards.reduce((s, c) => s + c.endingBalance, 0)).toFixed(2)}</td></tr>`).join('');
-    const detailedChartCanvasId = `detailedLineChart-${scenarioResult.scenarioId.replace('scenario-','')}`; // Ensure unique ID
-    const breakdownHTML = `
-        <div class="accordion-item" id="${accordionItemId}">
-            <div class="accordion-header"><h4>Detailed Breakdown for ${scenarioResult.title || `Scenario paying $${scenarioResult.totalMonthlyPayment.toFixed(2)}/month`}</h4></div>
-            <div class="accordion-content">
-                <p class="strategy-explanation">This plan uses the Debt Avalanche method. Extra payments are applied to your highest-interest card first to save you the most money.</p>
-                <div class="table-responsive"><table class="month-by-month-table">
-                    <thead><tr><th>Month</th><th>Total Payment</th><th>Interest Paid</th><th>Principal Paid</th><th>Overall Ending Balance</th></tr></thead>
-                    <tbody>${monthByMonthRows}</tbody>
-                </table></div>
-                <canvas id="${detailedChartCanvasId}" style="margin-top: 20px; max-height:300px;"></canvas>
-            </div></div>`;
-    accordionContainer.insertAdjacentHTML('beforeend', breakdownHTML);
-    const detailedCtx = document.getElementById(detailedChartCanvasId)?.getContext('2d');
-    if (detailedCtx) renderDetailedLineChartForScenario(detailedCtx, scenarioResult, initialCardsData);
+function populateDetailedTabs_V3(allScenarioResults, initialCardsData) {
+    const tabListContainer = document.getElementById('detailed-scenario-breakdown').querySelector('.tab-list-container');
+    const tabContentContainer = document.getElementById('detailed-scenario-breakdown').querySelector('.tab-content-container');
+    tabListContainer.innerHTML = ''; tabContentContainer.innerHTML = '';
+    if (!allScenarioResults || allScenarioResults.length === 0) return;
+    window.detailedAreaCharts = window.detailedAreaCharts || {};
+
+    allScenarioResults.forEach((scenario, index) => {
+        const tabId = `tab-${scenario.scenarioId.replace(/\s+/g, '-')}`;
+        const panelId = `panel-${scenario.scenarioId.replace(/\s+/g, '-')}`;
+        const tabButton = document.createElement('button');
+        tabButton.className = 'tab-button'; tabButton.role = 'tab';
+        tabButton.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+        tabButton.setAttribute('aria-controls', panelId); tabButton.id = tabId;
+        tabButton.textContent = scenario.title;
+        if (index === 0) tabButton.classList.add('is-active');
+        tabButton.addEventListener('click', () => {
+            tabListContainer.querySelectorAll('.tab-button').forEach(btn => { btn.classList.remove('is-active'); btn.setAttribute('aria-selected', 'false'); });
+            tabContentContainer.querySelectorAll('.tab-content-panel').forEach(panel => panel.classList.remove('is-active'));
+            tabButton.classList.add('is-active'); tabButton.setAttribute('aria-selected', 'true');
+            const targetPanel = document.getElementById(panelId);
+            if (targetPanel) targetPanel.classList.add('is-active');
+        });
+        tabListContainer.appendChild(tabButton);
+
+        const tabPanel = document.createElement('div');
+        tabPanel.className = 'tab-content-panel'; tabPanel.id = panelId;
+        tabPanel.setAttribute('role', 'tabpanel'); tabPanel.setAttribute('aria-labelledby', tabId);
+        if (index === 0) tabPanel.classList.add('is-active');
+
+        const years = Math.floor(scenario.monthsToPayOff / 12); const months = scenario.monthsToPayOff % 12;
+        let timeText = (years > 0 ? `${years} yr${years > 1 ? 's' : ''} ` : '') + (months > 0 || years === 0 ? `${months} mo${months > 1 ? 's' : ''}` : '');
+        if (timeText.trim() === "" && scenario.monthsToPayOff === 0 && scenario.totalPrincipalPaid > 0) timeText = "Instant"; else if (timeText.trim() === "") timeText = "N/A";
+
+        const tableRows = scenario.monthlyBreakdown.map(m => {
+            let overallStartingBalanceForMonth = 0;
+            if (m.month === 1) overallStartingBalanceForMonth = initialCardsData.reduce((sum, card) => sum + card.balance, 0);
+            else {
+                const prevMonthBreakdown = scenario.monthlyBreakdown.find(prev_m => prev_m.month === m.month -1);
+                if(prevMonthBreakdown) overallStartingBalanceForMonth = prevMonthBreakdown.cards.reduce((sum, card) => sum + card.endingBalance, 0);
+            }
+            const overallEndingBalanceForMonth = m.cards.reduce((sum, card) => sum + card.endingBalance, 0);
+            return `<tr><td>${m.month}</td><td>$${overallStartingBalanceForMonth.toFixed(2)}</td><td>$${m.totalPaymentThisMonth.toFixed(2)}</td><td>$${m.totalInterestThisMonth.toFixed(2)}</td><td>$${Math.max(0, overallEndingBalanceForMonth).toFixed(2)}</td></tr>`;
+        }).join('');
+
+        const stackedAreaChartCanvasId = `stackedAreaChart-${scenario.scenarioId.replace(/\s+/g, '-')}`;
+        tabPanel.innerHTML = `
+            <div class="scenario-metrics-header">
+                <div class="metric-item">Time to Debt-Free <strong>${timeText}</strong></div>
+                <div class="metric-item">Total Interest Paid <strong class="interest-value">$${scenario.totalInterestPaid.toFixed(2)}</strong></div>
+                <div class="metric-item">Total Principal Paid <strong>$${scenario.totalPrincipalPaid.toFixed(2)}</strong></div>
+            </div>
+            <div class="chart-container"><canvas id="${stackedAreaChartCanvasId}"></canvas></div>
+            <div class="table-responsive">
+                <table class="month-by-month-table">
+                    <thead><tr><th>Month</th><th>Starting Balance</th><th>Payment</th><th>Interest</th><th>Ending Balance</th></tr></thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            </div>`;
+        tabContentContainer.appendChild(tabPanel);
+        const stackedAreaCtx = document.getElementById(stackedAreaChartCanvasId)?.getContext('2d'); // Use optional chaining
+        if(stackedAreaCtx) renderStackedAreaChart_V3(stackedAreaCtx, scenario, initialCardsData); else console.error("Canvas not found for " + stackedAreaChartCanvasId);
+
+    });
 }
 
-function renderDetailedLineChartForScenario(ctx, scenarioResult, initialCardsData) {
+function renderStackedAreaChart_V3(ctx, scenarioResult, initialCardsData) {
+    if (!ctx) { console.error("renderStackedAreaChart_V3: context is null for scenario", scenarioResult.scenarioId); return; }
     const numMonths = scenarioResult.monthsToPayOff;
-    const detailedLabels = ['Initial', ...Array.from({ length: numMonths }, (_, i) => `M${i + 1}`)]; // Shorter month labels
+    const labels = ['Initial', ...Array.from({ length: numMonths }, (_, i) => `M${i + 1}`)];
     const datasets = [];
-    const chartColors = ['#007BFF', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#fd7e14', '#20c997'];
-
-    const overallDebtData = [initialCardsData.reduce((s, c) => s + c.balance, 0)];
-    let runningTotalDebt = overallDebtData[0];
-    scenarioResult.monthlyBreakdown.forEach(monthData => {
-        runningTotalDebt -= monthData.totalPrincipalPaidThisMonth;
-        overallDebtData.push(Math.max(0, runningTotalDebt));
-    });
-    datasets.push({ label: 'Overall Debt', data: overallDebtData, borderColor: chartColors[0], backgroundColor: 'rgba(0,123,255,0.1)', fill: true, tension: 0.1 });
+    const cardColors = ['rgba(0, 123, 255, 0.5)', 'rgba(40, 167, 69, 0.5)', 'rgba(253, 126, 20, 0.5)', 'rgba(108, 117, 125, 0.5)', 'rgba(23, 162, 184, 0.5)'];
 
     initialCardsData.forEach((initialCard, cardIndex) => {
-        const cardDebtData = [initialCard.balance];
+        const cardBalanceHistory = [initialCard.balance];
         let currentCardBalance = initialCard.balance;
         scenarioResult.monthlyBreakdown.forEach(monthData => {
             const cardMonthDetail = monthData.cards.find(c => c.id === initialCard.id);
             currentCardBalance = cardMonthDetail ? cardMonthDetail.endingBalance : currentCardBalance;
-            cardDebtData.push(Math.max(0, currentCardBalance));
+            cardBalanceHistory.push(Math.max(0, currentCardBalance));
         });
-        datasets.push({ label: `${initialCard.nickname}`, data: cardDebtData, borderColor: chartColors[(cardIndex + 1) % chartColors.length], fill: false, tension: 0.1, borderDash: [5, 5] });
+        datasets.push({
+            label: initialCard.nickname, data: cardBalanceHistory, tension: 0.1, fill: true,
+            backgroundColor: cardColors[cardIndex % cardColors.length],
+            borderColor: cardColors[cardIndex % cardColors.length].replace('0.5', '1'),
+            pointRadius: 0, pointHitRadius: 10
+        });
     });
 
-    if (window.detailedChartInstances[scenarioResult.scenarioId]) window.detailedChartInstances[scenarioResult.scenarioId].destroy();
-    window.detailedChartInstances[scenarioResult.scenarioId] = new Chart(ctx, {
-        type: 'line', data: { labels: detailedLabels, datasets: datasets },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: false }, legend: { position: 'bottom', labels:{boxWidth:12,padding:10} }}, scales: { y: { beginAtZero: true, title: { display: true, text: 'Remaining Debt ($)' }}, x: { title: { display: true, text: 'Months' }}}}
+    const chartId = `stackedArea-${scenarioResult.scenarioId.replace(/\s+/g, '-')}`;
+    if (window.detailedAreaCharts[chartId]) window.detailedAreaCharts[chartId].destroy();
+    window.detailedAreaCharts[chartId] = new Chart(ctx, {
+        type: 'line', data: { labels: labels, datasets: datasets },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { title: { display: false }, legend: { position: 'bottom' } },
+            scales: {
+                y: { stacked: true, beginAtZero: true, title: { display: true, text: 'Debt Balance ($)' } },
+                x: { title: { display: true, text: 'Months' } }
+            },
+            interaction: { mode: 'index', intersect: false },
+        }
     });
 }
 
-/**
- * Calculates repayment scenarios based on card data and specified total monthly payments.
- * @param {Array<object>} initialCardsData - Array of initial card states.
- * @param {Array<object>} scenariosInput - Array of scenarios, each with a totalMonthlyPayment.
- * @returns {Array<object>} Array of scenario results.
- */
+function setupTooltipsV3() {
+    let currentTooltipV3 = null;
+    function showTooltip(triggerElement) {
+        const tooltipText = triggerElement.dataset.tooltipText;
+        if (!tooltipText) return;
+        hideTooltip();
+        currentTooltipV3 = document.createElement('div');
+        currentTooltipV3.className = 'info-tooltip-popup-v3';
+        currentTooltipV3.textContent = tooltipText;
+        document.body.appendChild(currentTooltipV3);
+        const rect = triggerElement.getBoundingClientRect();
+        let top = rect.top + window.scrollY - currentTooltipV3.offsetHeight - 8;
+        let left = rect.left + window.scrollX + (rect.width / 2) - (currentTooltipV3.offsetWidth / 2);
+        if (top < window.scrollY + 8) top = rect.bottom + window.scrollY + 8;
+        if (left < window.scrollX + 8) left = window.scrollX + 8;
+        if (left + currentTooltipV3.offsetWidth > window.scrollX + document.documentElement.clientWidth - 8) {
+            left = window.scrollX + document.documentElement.clientWidth - 8 - currentTooltipV3.offsetWidth;
+        }
+        currentTooltipV3.style.top = `${top}px`; currentTooltipV3.style.left = `${left}px`;
+        currentTooltipV3.style.opacity = '1';
+    }
+    function hideTooltip() { if (currentTooltipV3) { currentTooltipV3.remove(); currentTooltipV3 = null; } }
+    document.body.addEventListener('mouseover', e => { if (e.target.closest('.tooltip-trigger-v3')) showTooltip(e.target.closest('.tooltip-trigger-v3')); });
+    document.body.addEventListener('mouseout', e => { if (e.target.closest('.tooltip-trigger-v3')) hideTooltip(); });
+    document.body.addEventListener('focusin', e => { if (e.target.closest('.tooltip-trigger-v3')) showTooltip(e.target.closest('.tooltip-trigger-v3')); });
+    document.body.addEventListener('focusout', e => { if (e.target.closest('.tooltip-trigger-v3')) hideTooltip(); });
+}
+
 function calculateAllScenarios(initialCardsData, scenariosInput) {
     const results = [];
-
     scenariosInput.forEach(scenarioInput => {
-        // Deep copy of card data for this specific scenario simulation
         let currentCardsData = JSON.parse(JSON.stringify(initialCardsData));
         let months = 0;
         let totalInterestPaidForScenario = 0;
-        let totalPrincipalPaidForScenario = 0; // Should ideally sum up to initial total principal
+        let totalPrincipalPaidForScenario = 0;
         const monthlyBreakdown = [];
-
         while (currentCardsData.some(card => card.balance > 0)) {
             months++;
-            // Safety break for scenarios that might run too long (e.g., payments don't cover interest)
-            if (months > 1200) { // Increased from 1000 to 100 years, should be plenty
-                console.warn(`Scenario ${scenarioInput.id} (${scenarioInput.title}) exceeded 1200 months. Calculation stopped.`);
-                monthlyBreakdown.push({ month: months, warning: "Calculation stopped after 1200 months due to excessive duration." });
-                break;
+            if (months > 1200) {
+                monthlyBreakdown.push({ month: months, warning: "Calculation stopped (100yr limit)." }); break;
             }
-
-            let monthDetail = {
-                month: months,
-                cards: [], // Details for each card this month
-                totalPaymentThisMonth: 0,
-                totalInterestThisMonth: 0,
-                totalPrincipalPaidThisMonth: 0
-            };
-
-            // Allocate the total monthly payment for this scenario across all cards
+            let monthDetail = { month: months, cards: [], totalPaymentThisMonth: 0, totalInterestThisMonth: 0, totalPrincipalPaidThisMonth: 0 };
             const paymentAllocations = allocatePaymentsAvalanche(currentCardsData, scenarioInput.totalMonthlyPayment);
             let scenarioTotalActualPaymentThisMonth = 0;
-
             currentCardsData.forEach(card => {
-                if (card.balance <= 0) { // Card is already paid off
-                    monthDetail.cards.push({
-                        id: card.id, nickname: card.nickname, startingBalance: 0,
-                        payment: 0, interestPaid: 0, principalPaid: 0, endingBalance: 0
-                    });
-                    return;
+                if (card.balance <= 0) {
+                    monthDetail.cards.push({ id: card.id, nickname: card.nickname, startingBalance: 0, payment: 0, interestPaid: 0, principalPaid: 0, endingBalance: 0 }); return;
                 }
-
                 const allocation = paymentAllocations.find(a => a.cardId === card.id);
                 let paymentForThisCard = allocation ? allocation.paymentAmount : 0;
-
                 const cardInitialBalanceForMonth = card.balance;
                 const interestForMonthOnCard = calculateMonthlyInterest(card.balance, card.interestRate);
-
-                // Adjust payment if it's more than what's needed to pay off the card
                 const amountToPayOffCompletely = card.balance + interestForMonthOnCard;
-                if (paymentForThisCard > amountToPayOffCompletely) {
-                    paymentForThisCard = amountToPayOffCompletely;
-                }
+                if (paymentForThisCard > amountToPayOffCompletely) paymentForThisCard = amountToPayOffCompletely;
 
                 const paymentResult = simulateOneMonthPayment(card, paymentForThisCard);
-
-                // Update card's balance for the next iteration/month
                 card.balance = paymentResult.newBalance;
-
-                // Aggregate totals for the scenario
                 totalInterestPaidForScenario += paymentResult.interestPaid;
-                // Ensure principal paid isn't negative or excessively large due to payment adjustments
                 totalPrincipalPaidForScenario += paymentResult.principalPaid;
-
                 scenarioTotalActualPaymentThisMonth += paymentForThisCard;
                 monthDetail.totalInterestThisMonth += paymentResult.interestPaid;
                 monthDetail.totalPrincipalPaidThisMonth += paymentResult.principalPaid;
-
                 monthDetail.cards.push({
-                    id: card.id,
-                    nickname: card.nickname,
-                    startingBalance: cardInitialBalanceForMonth,
-                    payment: paymentForThisCard,
-                    interestPaid: paymentResult.interestPaid,
-                    principalPaid: paymentResult.principalPaid,
+                    id: card.id, nickname: card.nickname,
+                    startingBalance: cardInitialBalanceForMonth, payment: paymentForThisCard,
+                    interestPaid: paymentResult.interestPaid, principalPaid: paymentResult.principalPaid,
                     endingBalance: card.balance
                 });
             });
-
             monthDetail.totalPaymentThisMonth = scenarioTotalActualPaymentThisMonth;
             monthlyBreakdown.push(monthDetail);
         }
-
         results.push({
-            scenarioId: scenarioInput.id, // Use the robust ID from scenarioData
-            title: scenarioInput.title, // Carry over the title
+            scenarioId: scenarioInput.id,
+            title: scenarioInput.title,
             totalMonthlyPayment: scenarioInput.totalMonthlyPayment,
             monthsToPayOff: months,
             totalInterestPaid: parseFloat(totalInterestPaidForScenario.toFixed(2)),
@@ -524,14 +515,6 @@ function calculateAllScenarios(initialCardsData, scenariosInput) {
             monthlyBreakdown: monthlyBreakdown
         });
     });
-
     return results;
 }
-
-
-// --- Calculation Engine (Copied from calculation_engine.js for simplicity in this single file, or keep separate) ---
-// calculation_engine.js content would go here if merging. For now, assuming it's included separately in HTML.
-// Ensure calculateMonthlyInterest, simulateOneMonthPayment, allocatePaymentsAvalanche are available.
-
-// (The actual calculation_engine.js content is not included here for brevity, but it's used by calculateAllScenarios)
-// Make sure calculation_engine.js is loaded before this script in index.html
+// Ensure calculation_engine.js is loaded before this script.
