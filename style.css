@@ -1,0 +1,179 @@
+body {
+    font-family: sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header {
+    background: #333;
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+}
+
+main {
+    padding: 1rem;
+    max-width: 1000px; /* Slightly narrower for better readability on wider screens */
+    margin: auto;
+    overflow: hidden;
+}
+
+section {
+    background: #fff;
+    margin-bottom: 1.5rem; /* Increased spacing between sections */
+    padding: 1.5rem; /* Increased padding within sections */
+    border-radius: 8px; /* Slightly more rounded corners */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+}
+
+h2 {
+    margin-top: 0; /* Remove default top margin for h2 within sections */
+    color: #333;
+}
+
+footer {
+    text-align: center;
+    padding: 1rem;
+    background: #333;
+    color: #fff;
+    margin-top: 1rem;
+}
+
+/* Basic styling for form elements - will be expanded */
+input[type="text"],
+input[type="number"] {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    width: calc(100% - 1.2rem); /* Adjust for padding */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+label {
+    display: block;
+    margin-bottom: 0.2rem;
+    font-weight: bold;
+}
+
+.credit-card-entry, .scenario-entry {
+    border: 1px solid #eee;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.credit-card-entry h3, .scenario-entry h3 {
+    margin-top: 0;
+    color: #555;
+}
+
+button {
+    background: #5cb85c;
+    color: white;
+    padding: 0.7rem 1rem;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+button:hover {
+    background: #4cae4c;
+}
+
+#add-card-btn, #add-scenario-btn {
+    background-color: #007bff;
+    margin-top: 0.5rem; /* Space above if there are entries */
+}
+#add-card-btn:hover, #add-scenario-btn:hover {
+    background-color: #0056b3;
+}
+
+
+#calculate-btn {
+    display: block;
+    margin: 1.5rem auto; /* Increased margin */
+    padding: 0.9rem 2rem; /* Slightly larger padding */
+    font-size: 1.2em; /* Slightly larger font */
+    background-color: #28a745; /* Greener shade for primary action */
+}
+#calculate-btn:hover {
+    background-color: #218838;
+}
+
+
+#results-section .results-title { /* New class for the main results title */
+    text-align: center;
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+#results-section h2, #results-section h3, #results-section h4 {
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+#results-section h3 { /* More specific targeting for scenario detail titles if needed */
+    color: #444;
+}
+
+
+#optimal-strategy-summary {
+    background-color: #e6ffed;
+    border: 1px solid #5cb85c;
+    padding: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    border-radius: 4px;
+}
+
+#optimal-strategy-summary h4 {
+    margin-top: 0;
+    color: #2e7d32;
+}
+
+#optimal-strategy-summary p {
+    margin-bottom: 0.5rem;
+}
+
+#optimal-strategy-summary .explanation {
+    font-size: 0.9em;
+    color: #555;
+    margin-top: 1rem;
+}
+
+.scenario-detail-container {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fdfdfd;
+}
+
+.scenario-detail-container h3 {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.feedback-link {
+    font-size: 0.9em;
+    margin-top: 0.5rem;
+}
+
+.feedback-link a {
+    color: #86c5da; /* Light blue, stands out a bit on dark footer */
+    text-decoration: none;
+}
+
+.feedback-link a:hover {
+    text-decoration: underline;
+}

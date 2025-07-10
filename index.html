@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Card Debt Visualizer</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Credit Card Debt Visualizer</h1>
+    </header>
+    <main>
+        <section id="input-section">
+            <h2>Enter Your Credit Card Details</h2>
+            <div id="credit-card-forms-container">
+                <!-- Initial credit card form will be here, others added by JS -->
+                <div class="credit-card-entry">
+                    <h3>Card 1</h3>
+                    <label for="card-nickname-1">Card Nickname:</label>
+                    <input type="text" id="card-nickname-1" name="card-nickname" placeholder="e.g., Visa Rewards">
+
+                    <label for="current-balance-1">Current Balance ($):</label>
+                    <input type="number" id="current-balance-1" name="current-balance" placeholder="e.g., 5000" step="0.01" min="0">
+
+                    <label for="interest-rate-1">Monthly Interest Rate (%):</label>
+                    <input type="number" id="interest-rate-1" name="interest-rate" placeholder="e.g., 1.5" step="0.01" min="0">
+
+                    <label for="min-payment-percentage-1">Minimum Payment (% of Balance):</label>
+                    <input type="number" id="min-payment-percentage-1" name="min-payment-percentage" placeholder="e.g., 2" step="0.01" min="0">
+                </div>
+            </div>
+            <button id="add-card-btn">Add Another Card</button>
+        </section>
+
+        <section id="scenario-input-section">
+            <h2>Enter Repayment Scenarios</h2>
+            <div id="scenario-forms-container">
+                <div class="scenario-entry">
+                    <h3>Scenario 1</h3>
+                    <label for="total-monthly-payment-1">Total Monthly Payment ($):</label>
+                    <input type="number" id="total-monthly-payment-1" name="total-monthly-payment" placeholder="e.g., 300" step="0.01" min="0">
+                </div>
+            </div>
+            <button id="add-scenario-btn">Add Another Scenario</button>
+        </section>
+
+        <section id="calculate-section">
+            <button id="calculate-btn">Calculate Repayment Options</button>
+        </section>
+
+        <section id="results-section">
+            <h2 class="results-title">Your Repayment Options Explored</h2>
+            <div id="summary-charts-container">
+                <canvas id="comparisonChart"></canvas>
+            </div>
+            <div id="optimal-strategy-summary">
+                <!-- Optimal strategy text will go here -->
+            </div>
+            <h2>Detailed Scenario Breakdowns</h2>
+            <div id="detailed-charts-container">
+                <!-- Detailed charts for each scenario will go here -->
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>All data is processed locally in your browser. No information is saved or transmitted.</p>
+        <p class="feedback-link">Happy with the tool? <a href="#" id="feedbackSurveyLink" target="_blank" rel="noopener noreferrer">Share your feedback (anonymous survey)</a>.</p>
+    </footer>
+    <script src="calculation_engine.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
