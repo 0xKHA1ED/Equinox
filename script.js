@@ -426,6 +426,109 @@ function renderDetailedLineChartForScenario(ctx, scenarioResult, initialCardsDat
     });
 }
 
+/**
+ * Calculates repayment scenarios based on card data and specified total monthly payments.
+ * @param {Array<object>} initialCardsData - Array of initial card states.
+ * @param {Array<object>} scenariosInput - Array of scenarios, each with a totalMonthlyPayment.
+ * @returns {Array<object>} Array of scenario results.
+ */
+function calculateAllScenarios(initialCardsData, scenariosInput) {
+    const results = [];
+
+    scenariosInput.forEach(scenarioInput => {
+        // Deep copy of card data for this specific scenario simulation
+        let currentCardsData = JSON.parse(JSON.stringify(initialCardsData));
+        let months = 0;
+        let totalInterestPaidForScenario = 0;
+        let totalPrincipalPaidForScenario = 0; // Should ideally sum up to initial total principal
+        const monthlyBreakdown = [];
+
+        while (currentCardsData.some(card => card.balance > 0)) {
+            months++;
+            // Safety break for scenarios that might run too long (e.g., payments don't cover interest)
+            if (months > 1200) { // Increased from 1000 to 100 years, should be plenty
+                console.warn(`Scenario ${scenarioInput.id} (${scenarioInput.title}) exceeded 1200 months. Calculation stopped.`);
+                monthlyBreakdown.push({ month: months, warning: "Calculation stopped after 1200 months due to excessive duration." });
+                break;
+            }
+
+            let monthDetail = {
+                month: months,
+                cards: [], // Details for each card this month
+                totalPaymentThisMonth: 0,
+                totalInterestThisMonth: 0,
+                totalPrincipalPaidThisMonth: 0
+            };
+
+            // Allocate the total monthly payment for this scenario across all cards
+            const paymentAllocations = allocatePaymentsAvalanche(currentCardsData, scenarioInput.totalMonthlyPayment);
+            let scenarioTotalActualPaymentThisMonth = 0;
+
+            currentCardsData.forEach(card => {
+                if (card.balance <= 0) { // Card is already paid off
+                    monthDetail.cards.push({
+                        id: card.id, nickname: card.nickname, startingBalance: 0,
+                        payment: 0, interestPaid: 0, principalPaid: 0, endingBalance: 0
+                    });
+                    return;
+                }
+
+                const allocation = paymentAllocations.find(a => a.cardId === card.id);
+                let paymentForThisCard = allocation ? allocation.paymentAmount : 0;
+
+                const cardInitialBalanceForMonth = card.balance;
+                const interestForMonthOnCard = calculateMonthlyInterest(card.balance, card.interestRate);
+
+                // Adjust payment if it's more than what's needed to pay off the card
+                const amountToPayOffCompletely = card.balance + interestForMonthOnCard;
+                if (paymentForThisCard > amountToPayOffCompletely) {
+                    paymentForThisCard = amountToPayOffCompletely;
+                }
+
+                const paymentResult = simulateOneMonthPayment(card, paymentForThisCard);
+
+                // Update card's balance for the next iteration/month
+                card.balance = paymentResult.newBalance;
+
+                // Aggregate totals for the scenario
+                totalInterestPaidForScenario += paymentResult.interestPaid;
+                // Ensure principal paid isn't negative or excessively large due to payment adjustments
+                totalPrincipalPaidForScenario += paymentResult.principalPaid;
+
+                scenarioTotalActualPaymentThisMonth += paymentForThisCard;
+                monthDetail.totalInterestThisMonth += paymentResult.interestPaid;
+                monthDetail.totalPrincipalPaidThisMonth += paymentResult.principalPaid;
+
+                monthDetail.cards.push({
+                    id: card.id,
+                    nickname: card.nickname,
+                    startingBalance: cardInitialBalanceForMonth,
+                    payment: paymentForThisCard,
+                    interestPaid: paymentResult.interestPaid,
+                    principalPaid: paymentResult.principalPaid,
+                    endingBalance: card.balance
+                });
+            });
+
+            monthDetail.totalPaymentThisMonth = scenarioTotalActualPaymentThisMonth;
+            monthlyBreakdown.push(monthDetail);
+        }
+
+        results.push({
+            scenarioId: scenarioInput.id, // Use the robust ID from scenarioData
+            title: scenarioInput.title, // Carry over the title
+            totalMonthlyPayment: scenarioInput.totalMonthlyPayment,
+            monthsToPayOff: months,
+            totalInterestPaid: parseFloat(totalInterestPaidForScenario.toFixed(2)),
+            totalPrincipalPaid: parseFloat(totalPrincipalPaidForScenario.toFixed(2)),
+            monthlyBreakdown: monthlyBreakdown
+        });
+    });
+
+    return results;
+}
+
+
 // --- Calculation Engine (Copied from calculation_engine.js for simplicity in this single file, or keep separate) ---
 // calculation_engine.js content would go here if merging. For now, assuming it's included separately in HTML.
 // Ensure calculateMonthlyInterest, simulateOneMonthPayment, allocatePaymentsAvalanche are available.
