@@ -1,3 +1,5 @@
+import { calculateMonthlyInterest, simulateOneMonthPayment, allocatePaymentsAvalanche } from './calculation_engine.js';
+
 // V3 Design - Credit Card Debt Visualizer - script.js
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -33,9 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.detailedAreaCharts = {}; // To store instances of detailed charts for destruction
     window.scenarioBarChart = null; // For the main comparison bar chart
-
-    addCardFormV3();
-    addScenarioFormV3();
 
     // --- Event Listeners (V3) ---
     if (addCardBtn) addCardBtn.addEventListener('click', addCardFormV3);
@@ -74,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  window.scenarioBarChart.destroy();
                  window.scenarioBarChart = null;
             }
-            document.getElementById('detailed-scenario-breakdown').querySelector('.tab-list-container').innerHTML = '';
+            document.getElementById('detailed-scenario-breakdown').querySelector('[role="tablist"]').innerHTML = '';
             document.getElementById('detailed-scenario-breakdown').querySelector('.tab-content-container').innerHTML = '';
             if (window.detailedAreaCharts) {
                 Object.values(window.detailedAreaCharts).forEach(chart => chart.destroy());
@@ -101,11 +100,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     setupTooltipsV3();
+
+    addCardFormV3();
+    addScenarioFormV3();
 }); // End DOMContentLoaded
 
 
-function addCardFormV3() {
+function addCardFormV3(event) {
     const container = document.getElementById('credit-card-forms-container');
+    if (!container) return;
+
+    const isButtonClick = event && event.type === 'click';
+    const cardExists = container.querySelector('.credit-card-item-card');
+
+    // On initial page load (not a click), if a card already exists, do nothing.
+    // This prevents adding a card if the user navigates back to the page and the form state is preserved.
+    if (!isButtonClick && cardExists) {
+        return;
+    }
     const cardIndex = container.querySelectorAll('.credit-card-item-card').length + 1;
     const newCardId = `card-item-dynamic-${Date.now()}`; // Unique ID for element
 
@@ -163,8 +175,17 @@ function updateCardTitlesV3() {
     });
 }
 
-function addScenarioFormV3() {
+function addScenarioFormV3(event) {
     const container = document.getElementById('scenario-forms-container');
+    if (!container) return;
+
+    const isButtonClick = event && event.type === 'click';
+    const scenarioExists = container.querySelector('.scenario-input-item');
+
+    // On initial page load (not a click), if a scenario already exists, do nothing.
+    if (!isButtonClick && scenarioExists) {
+        return;
+    }
     const scenarioIndex = container.querySelectorAll('.scenario-input-item').length + 1;
     const newScenarioId = `scenario-item-dynamic-${Date.now()}`;
     const scenarioHTML = `
@@ -329,7 +350,7 @@ function renderScenarioBarChart_V3(allScenarioResults, optimalScenarioId) {
 }
 
 function populateDetailedTabs_V3(allScenarioResults, initialCardsData) {
-    const tabListContainer = document.getElementById('detailed-scenario-breakdown').querySelector('.tab-list-container');
+    const tabListContainer = document.getElementById('detailed-scenario-breakdown').querySelector('[role="tablist"]');
     const tabContentContainer = document.getElementById('detailed-scenario-breakdown').querySelector('.tab-content-container');
     tabListContainer.innerHTML = ''; tabContentContainer.innerHTML = '';
     if (!allScenarioResults || allScenarioResults.length === 0) return;

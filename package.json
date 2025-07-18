@@ -5,5 +5,14 @@
     "@tailwindcss/postcss": "^4.1.11",
     "postcss-cli": "^11.0.1",
     "tailwindcss": "^4.1.11"
+  },
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },
+  "devDependencies": {
+    "jest": "^30.0.4"
+  },
+  "jest": {
+    "transform": {}
   }
 }

@@ -6,7 +6,7 @@
  * @param {number} monthlyInterestRate - The monthly interest rate (e.g., 0.015 for 1.5%).
  * @returns {number} The calculated monthly interest.
  */
-function calculateMonthlyInterest(balance, monthlyInterestRate) {
+export function calculateMonthlyInterest(balance, monthlyInterestRate) {
     if (balance <= 0) return 0;
     return parseFloat((balance * monthlyInterestRate).toFixed(2));
 }
@@ -17,7 +17,7 @@ function calculateMonthlyInterest(balance, monthlyInterestRate) {
  * @param {number} paymentAmount - The payment made towards this card for the month.
  * @returns {object} Updated card state { newBalance, interestPaid, principalPaid, minPaymentRequired }
  */
-function simulateOneMonthPayment(card, paymentAmount) {
+export function simulateOneMonthPayment(card, paymentAmount) {
     const interestForMonth = calculateMonthlyInterest(card.balance, card.interestRate);
     let principalPaid = parseFloat((paymentAmount - interestForMonth).toFixed(2));
 
@@ -56,7 +56,7 @@ function simulateOneMonthPayment(card, paymentAmount) {
  * @param {number} totalMonthlyPayment - The total amount available for payments.
  * @returns {Array<object>} Array of payment allocations { cardId, paymentAmount }
  */
-function allocatePaymentsAvalanche(cards, totalMonthlyPayment) {
+export function allocatePaymentsAvalanche(cards, totalMonthlyPayment) {
     let remainingPayment = totalMonthlyPayment;
     const allocations = cards.map(card => ({ cardId: card.id, paymentAmount: 0, originalBalance: card.balance, interestRate: card.interestRate, minPaymentPercentage: card.minPaymentPercentage }));
 
@@ -87,14 +87,9 @@ function allocatePaymentsAvalanche(cards, totalMonthlyPayment) {
         if (remainingPayment <= 0) break;
 
         const allocation = allocations.find(a => a.cardId === card.id);
-        const currentCardBalance = card.balance; // Balance before any extra payment this month
+        const currentCardBalance = card.balance;
 
-        // Max additional payment is either remaining payment or enough to pay off the card
-        // (considering interest that will accrue for THIS month on THIS card)
-        const interestThisMonth = calculateMonthlyInterest(currentCardBalance, card.interestRate);
-        const amountToPayOffCard = currentCardBalance + interestThisMonth - allocation.paymentAmount; // Already allocated min payment
-
-        const extraPayment = Math.min(remainingPayment, amountToPayOffCard);
+        const extraPayment = Math.min(remainingPayment, currentCardBalance);
 
         if (extraPayment > 0) {
             allocation.paymentAmount += extraPayment;
@@ -123,13 +118,3 @@ function allocatePaymentsAvalanche(cards, totalMonthlyPayment) {
 
     return allocations.map(a => ({cardId: a.cardId, paymentAmount: parseFloat(a.paymentAmount.toFixed(2))}));
 }
-
-
-// Export functions if using modules (e.g., for testing or if script.js becomes a module)
-// For browser environment, they are globally accessible if this script is loaded.
-// Example for Node.js/module environment:
-// module.exports = {
-// calculateMonthlyInterest,
-// simulateOneMonthPayment,
-// allocatePaymentsAvalanche
-// };
