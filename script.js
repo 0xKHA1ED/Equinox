@@ -125,15 +125,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Chart.js Global Styling ---
     try {
+        // Get the computed style of the root element where variables are defined
+        const rootStyles = getComputedStyle(document.documentElement);
+
+        // Read the actual color values from your CSS variables
+        const textPrimary = rootStyles.getPropertyValue('--text-primary').trim();
+        const textSecondary = rootStyles.getPropertyValue('--text-secondary').trim();
+        const glassBorder = rootStyles.getPropertyValue('--glass-border-color').trim();
+
+        // Now, assign the resolved colors to Chart.js
         Chart.defaults.font.family = "'Inter', sans-serif";
-        Chart.defaults.color = 'var(--text-secondary)';
-        Chart.defaults.borderColor = 'var(--glass-border-color)';
+        Chart.defaults.color = textSecondary; // Use the resolved variable
+        Chart.defaults.borderColor = glassBorder; // Use the resolved variable
         Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-        Chart.defaults.plugins.tooltip.titleColor = 'var(--text-primary)';
-        Chart.defaults.plugins.tooltip.bodyColor = 'var(--text-secondary)';
+        Chart.defaults.plugins.tooltip.titleColor = textPrimary; // Use the resolved variable
+        Chart.defaults.plugins.tooltip.bodyColor = textSecondary; // Use the resolved variable
         Chart.defaults.plugins.tooltip.padding = 10;
         Chart.defaults.plugins.tooltip.cornerRadius = 8;
-        Chart.defaults.plugins.legend.labels.color = 'var(--text-primary)';
+        Chart.defaults.plugins.legend.labels.color = textPrimary; // Use the resolved variable
         Chart.defaults.plugins.legend.labels.boxWidth = 12;
         Chart.defaults.plugins.legend.labels.padding = 15;
     } catch (e) {
