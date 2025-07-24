@@ -4,71 +4,292 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Credit Card Debt Visualizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="dist/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="lucide.min.js"></script>
-</head>
-<body class="bg-gray-50 text-gray-800 font-sans">
-    <header class="bg-white py-2 border-b border-gray-200">
-        <div class="max-w-6xl mx-auto px-4">
-            <!-- Minimal header, actual H1 title will be in the main content -->
-            <!-- Could have a logo or simple brand name here if desired -->
-        </div>
-    </header>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --background-url: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2070&auto=format&fit=crop');
+            --glass-bg: rgba(22, 22, 26, 0.5);
+            --glass-border-color: rgba(255, 255, 255, 0.1);
+            --text-primary: #EAEAEA;
+            --text-secondary: #B0B0B0;
+            --text-accent: #58A6FF;
+            --accent-color: #007BFF;
+            --destructive-color: #e57373;
+            --border-radius: 16px;
+            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
 
+        body {
+            background-image: var(--background-url);
+            background-color: #111827;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--glass-border-color);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        h1, h2 {
+            color: var(--text-primary);
+        }
+
+        p {
+            color: var(--text-secondary);
+        }
+
+        main .max-w-6xl {
+            padding: 1rem;
+        }
+
+        section {
+            padding: 2rem;
+        }
+
+        .credit-card-item-card, .scenario-input-item {
+            background: rgba(30, 30, 35, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--glass-border-color);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .credit-card-item-card:hover, .scenario-input-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+        }
+
+        .card-header-v3 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border-color);
+        }
+
+        .form-title-v3 {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-group input::placeholder {
+            color: #6c757d;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--text-accent);
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
+        }
+        
+        .tooltip-trigger-v3 {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        #add-card-btn, #add-scenario-btn {
+            width: 100%;
+            background: transparent;
+            border: 2px dashed var(--glass-border-color);
+            color: var(--text-secondary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        #add-card-btn:hover, #add-scenario-btn:hover {
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            border-style: solid;
+        }
+
+        #calculate-btn {
+            background: var(--text-accent);
+            color: #fff;
+            font-size: 1.125rem;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        #calculate-btn:hover {
+            background: #4092f8;
+            box-shadow: 0 0 20px rgba(88, 166, 255, 0.6);
+            transform: translateY(-3px);
+        }
+
+        .btn-remove-item {
+            background: transparent;
+            color: var(--destructive-color);
+            padding: 0.5rem;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-remove-item:hover {
+            background: rgba(229, 115, 115, 0.2);
+        }
+
+        #results-section {
+            border-top: 1px solid var(--glass-border-color);
+            margin-top: 2rem;
+            padding-top: 2rem;
+        }
+        #results-summary-card {
+            padding: 2rem;
+        }
+
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .tab-button.is-active {
+            color: var(--text-accent);
+            border-bottom-color: var(--text-accent);
+        }
+        .tab-button:hover {
+            background: var(--glass-bg);
+        }
+
+        .tab-content-panel {
+            padding-top: 1.5rem;
+        }
+
+        .month-by-month-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+        .month-by-month-table th, .month-by-month-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--glass-border-color);
+        }
+        .month-by-month-table thead th {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        .month-by-month-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .month-by-month-table tbody tr:hover {
+            background: var(--glass-bg);
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text-secondary);
+            border-top: 1px solid var(--glass-border-color);
+            padding: 1.5rem 0;
+        }
+        footer a {
+            color: var(--text-accent);
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="font-sans">
     <main class="py-8">
         <div class="max-w-6xl mx-auto px-4">
-            <h1 class="text-3xl font-bold text-gray-900 mb-4 text-center">Take Control of Your Credit Card Debt</h1>
-            <p class="text-lg text-gray-500 text-center max-w-3xl mx-auto mb-8">Enter your credit card details and potential monthly payment amounts to visualize your path to becoming debt-free. All calculations are done in your browser, and your data is never saved or transmitted.</p>
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-white mb-4">Credit Debt Freedom</h1>
+                <p class="text-lg text-gray-400 max-w-3xl mx-auto">Visualize your journey to being debt-free with our powerful calculator. Your data is private and processed only in your browser.</p>
+            </div>
 
             <div class="flex flex-wrap gap-8 mb-8">
-                <!-- This will be a two-column layout -->
-                <section id="credit-cards-column" class="flex-1 min-w-[300px]">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6 pb-2 border-b-2 border-gray-200">Your Credit Cards</h2>
+                <section id="credit-cards-column" class="flex-1 min-w-[300px] glass-card">
+                    <h2 class="text-2xl font-bold mb-6 pb-2 border-b-2 border-gray-700">Your Credit Cards</h2>
                     <div id="credit-card-forms-container">
                         <!-- Card input forms will be dynamically added here by JS -->
                     </div>
-                    <button id="add-card-btn" class="w-full mt-4 text-center inline-flex items-center justify-center font-medium cursor-pointer border py-3 px-6 text-base rounded-lg transition bg-white text-blue-600 border-blue-600 hover:bg-gray-50 hover:text-blue-800 hover:border-blue-800">
+                    <button id="add-card-btn" class="w-full mt-4 inline-flex items-center justify-center font-medium cursor-pointer">
                         <i data-lucide="plus-circle" class="mr-1.5"></i> Add Another Card
                     </button>
                 </section>
 
-                <section id="payment-scenarios-column" class="flex-1 min-w-[300px]">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6 pb-2 border-b-2 border-gray-200">Your Payment Scenarios</h2>
+                <section id="payment-scenarios-column" class="flex-1 min-w-[300px] glass-card">
+                    <h2 class="text-2xl font-bold mb-6 pb-2 border-b-2 border-gray-700">Your Payment Scenarios</h2>
                     <div id="scenario-forms-container">
                         <!-- Scenario input forms will be dynamically added here by JS -->
                     </div>
-                    <button id="add-scenario-btn" class="w-full mt-4 text-center inline-flex items-center justify-center font-medium cursor-pointer border py-3 px-6 text-base rounded-lg transition bg-white text-blue-600 border-blue-600 hover:bg-gray-50 hover:text-blue-800 hover:border-blue-800">
+                    <button id="add-scenario-btn" class="w-full mt-4 inline-flex items-center justify-center font-medium cursor-pointer">
                         <i data-lucide="plus-circle" class="mr-1.5"></i> Add Another Scenario
                     </button>
                 </section>
             </div>
 
             <div class="text-center mt-8 mb-8">
-                <button id="calculate-btn" class="inline-flex items-center justify-center font-semibold cursor-pointer border transition bg-blue-600 text-white border-blue-600 hover:bg-blue-800 hover:border-blue-800 py-4 px-8 text-lg rounded-lg">
+                <button id="calculate-btn" class="inline-flex items-center justify-center font-semibold cursor-pointer">
                     Calculate Scenarios <i data-lucide="arrow-right" class="ml-1.5"></i>
                 </button>
             </div>
 
-            <section id="results-section" class="mt-10 pt-6 border-t border-gray-200" style="display: none;"> /* Initially hidden */
-                <h2 class="text-2xl font-bold text-gray-900 mb-8 text-center">Here's Your Repayment Plan Comparison</h2>
+            <section id="results-section" class="mt-10 pt-6" style="display: none;">
+                <h2 class="text-3xl font-bold text-white mb-8 text-center">Repayment Comparison</h2>
 
-                <div id="results-summary-card" class="p-6 mb-8 bg-white border border-gray-200 rounded-xl shadow-md">
-                    <!-- Optimal Strategy Highlight & Savings Insight -->
-                    <div id="optimal-strategy-highlight"></div>
-                    <div id="savings-insight-text"></div>
-                    <!-- Bar chart for comparing scenarios -->
+                <div id="results-summary-card" class="mb-8 glass-card">
+                    <div id="optimal-strategy-highlight" class="text-lg font-semibold mb-4"></div>
+                    <div id="savings-insight-text" class="text-gray-300 mb-6"></div>
                     <div class="relative h-96 w-full">
                         <canvas id="scenarioComparisonBarChart"></canvas>
                     </div>
                 </div>
 
-                <div id="detailed-scenario-breakdown" class="mt-8">
-                    <div class="flex flex-wrap border-b-2 border-gray-200" role="tablist" aria-label="Scenario Details">
+                <div id="detailed-scenario-breakdown" class="mt-8 glass-card p-6">
+                    <div class="flex flex-wrap border-b-2 border-gray-700" role="tablist" aria-label="Scenario Details">
                         <!-- Tab buttons will be dynamically added here by JS -->
                     </div>
-                    <div class="tab-content-container">
+                    <div class="tab-content-container mt-4">
                         <!-- Tab panels (content) will be dynamically added here by JS -->
                     </div>
                 </div>
@@ -76,17 +297,18 @@
         </div>
     </main>
 
-    <footer class="bg-white py-4 mt-12 border-t border-gray-200 text-center text-sm text-gray-500">
+    <footer class="text-center text-sm">
         <div class="max-w-6xl mx-auto px-4">
             <p>&copy; 2024 Debt Visualizer. All data processed locally.
-                <a href="#" id="feedbackSurveyLink_v3" target="_blank" rel="noopener noreferrer" class="text-blue-600 no-underline hover:underline hover:text-blue-800">Feedback</a>
+                <a href="#" id="feedbackSurveyLink_v3" target="_blank" rel="noopener noreferrer">Feedback</a>
             </p>
         </div>
     </footer>
 
-    <script type="module" src="script.js"></script>
     <script>
-        lucide.createIcons(); // Initial render for static icons
+        lucide.createIcons();
     </script>
+    <script src="calculation_engine.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
